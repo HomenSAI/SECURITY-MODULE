@@ -1,0 +1,73 @@
+{
+ "$comment": "HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI",
+ "note": "Тест-вектор. Все пароли, ключи и данные вымышленные; в работе не использовать.",
+ "spec": "spec/README.md",
+ "base_key_text": "TEST-VECTOR-ONLY-field-key-0123456789-abcdefghijklmn",
+ "hkdf_salt": "homensai-rent/v1",
+ "gcm_key_hex": "5c4e9f4688a7483d3500b15b38b22a79074bc965750633259749034559e42cd3",
+ "cases": [
+  {
+   "name": "person-rnokpp",
+   "plaintext": "0000000001",
+   "context": {
+    "account_id": "acc-test-0001",
+    "table": "persons",
+    "column": "rnokpp_enc",
+    "row_id": "7"
+   },
+   "aad_hex": "686f6d656e7361692d72656e742f7631006163632d746573742d3030303100706572736f6e7300726e6f6b70705f656e630037",
+   "blob_hex": "763167636d7ce1b93645edf953918baf48fd417194457299edd6b46c1e0ecf36a5b814e828060e12cf6704a9"
+  },
+  {
+   "name": "phone-utf8",
+   "plaintext": "+380 00 000-00-01 (Иванов Иван)",
+   "context": {
+    "account_id": "acc-test-0001",
+    "table": "person_contacts",
+    "column": "value_enc",
+    "row_id": "c-12"
+   },
+   "aad_hex": "686f6d656e7361692d72656e742f7631006163632d746573742d3030303100706572736f6e5f636f6e74616374730076616c75655f656e6300632d3132",
+   "blob_hex": "763167636d7c061edbd9974a018e5b8eb1b2f9867cc74bbfc68319f9d85715f31204e9a731577acbafa2ad4715a34d3f9cb6f22cbc9680a65e21499f0b9698aa7e4864d63788e2ab009308"
+  },
+  {
+   "name": "no-context",
+   "plaintext": "служебное значение",
+   "context": null,
+   "aad_hex": "686f6d656e7361692d72656e742f763100000000",
+   "blob_hex": "763167636d7c592ba66e456764902f50f7de8382861bcbd002e285fb3e2edc1b99fab3b23335866d6c83c1ef650a3cae26990fa24bf6be39cc677e8b12fb3558d68c40aa60"
+  }
+ ],
+ "errors": [
+  {
+   "case": "person-rnokpp",
+   "context": {
+    "account_id": "acc-test-0001",
+    "table": "persons",
+    "column": "rnokpp_enc",
+    "row_id": "8"
+   },
+   "code": "value_error"
+  }
+ ],
+ "blind_index": [
+  {
+   "normalized": "0000000001",
+   "context": {
+    "account_id": "acc-test-0001",
+    "table": "persons",
+    "column": "rnokpp_enc"
+   },
+   "index": "bi2:694492703779aef4d7178de54ea0d39de193c7daebdb83bdb9f8d829551e3167"
+  }
+ ],
+ "key_check": {
+  "kcv_hex": "6cf0f70cdb54e280fc5ff62101d7b31ef29d73ac781e829d99c138cea768aad0",
+  "fingerprint": "6cf0f70c"
+ },
+ "legacy_v0stub": {
+  "plaintext": "0000000001",
+  "blob_hex": "7630737475627cc388eba5e2f116389391ce7f91a1a4d49d22e976d99a4db65e18c2625ab1cb49cadc6e96195a72985944279e2f1cee3e850e95fefc940b4b2b61",
+  "read_only": true
+ }
+}

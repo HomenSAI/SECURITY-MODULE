@@ -1,0 +1,47 @@
+{
+ "$comment": "HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI",
+ "note": "Тест-вектор. Все пароли, ключи и данные вымышленные; в работе не использовать.",
+ "spec": "spec/README.md",
+ "prefix": "HRKEY1 ",
+ "keyed": {
+  "comment": "HRKEY1 {\"ct\":\"-DYoki41igcG9PMFsSpzlks7iEhg5b1-WcqTOOcOsABXEYi0LMHROx9gllQtXdr2zsU-c6fJl1vE1b27\",\"epk\":\"mM23hH9hMejpm9SQeUk-kGqCf6lm25YuN-oSq9diJRI=\",\"kid\":\"HR1-7E9C-9C11-7760-EF7A\",\"mode\":\"custom\",\"nonce\":\"9vOdtzTfQZURlQ2Z\",\"pub\":\"t18bpKxiHxlK4aOSw24qt6ezwW7fiEjDSJIIzfriWhw=\",\"recovery\":[{\"id\":\"RK-ADEB-36B7\",\"sealed\":{\"ct\":\"EXknlGXPVXPxaWeyP61f3toXFlRaoiWKuX64aNGMJ2DoVn4ze0zqiOM-u4lQzblN\",\"epk\":\"08RG_-FkyGB4eabmmPRAWXnAOtPRzsU29L_3Inv6rA0=\",\"nonce\":\"cUPWIajek-KJjCMF\",\"rpk\":\"8E5bLT6pbqqLzjyIqRqTT6FKd_Fqm02azzfK68cGbzM=\",\"v\":1}}],\"v\":1,\"wrapped\":{\"ct\":\"AmhQS2Y4H2j22aKr97dB24QDHUG8wVgcSz3yoBLOdCsP-z71vPa7XuQ7yHGifEh7\",\"kdf\":\"argon2id\",\"m\":65536,\"nonce\":\"qffe9189jjzbArxA\",\"p\":4,\"salt\":\"2qsUx1VBwioR2KF-hbYXuw==\",\"t\":3,\"v\":1}}",
+  "secret": "4O_LSsKLzQh76U0zbSPpMD9nBKKAkFKGA5LBQhkt59E=",
+  "identity": "custom-password",
+  "ephemeral_private_hex": "022f80b647a8cb53c36539a790e11f148ee6a59a2ad8a57c9faf287373a84bd0",
+  "recovery_ephemeral_private_hex": "56077c65511cd4130960617cc2cfc8f278ea62163c15e2ca8062b6d3f1996811",
+  "open": [
+   {
+    "by": "password",
+    "input": "Пример-пароль-копий-2026",
+    "secret": "4O_LSsKLzQh76U0zbSPpMD9nBKKAkFKGA5LBQhkt59E="
+   },
+   {
+    "by": "recovery_key",
+    "input": "RK1-X2N59-JBPG7-QWBRQ-F6KZ3-SP1N7-VQEC0",
+    "secret": "4O_LSsKLzQh76U0zbSPpMD9nBKKAkFKGA5LBQhkt59E="
+   },
+   {
+    "by": "shamir_shares",
+    "input": "RS1-2-0BNDN-RNF56-7RV6S-N136J-BF8AC-JPHMY-VCC00 RS1-3-0FNDM-SXDJW-PF05J-RDSDC-1YFG9-2BRV6-J7040",
+    "secret": "4O_LSsKLzQh76U0zbSPpMD9nBKKAkFKGA5LBQhkt59E="
+   }
+  ],
+  "errors": [
+   {
+    "input": "Пример-пароль-копий-2026x",
+    "code": "bad_password"
+   },
+   {
+    "input": "RK1-HZ6R5-JBYDE-BWRHQ-TMY7H-NY39Q-QC7E0",
+    "code": "recovery_wrong"
+   },
+   {
+    "input": "",
+    "code": "no_key"
+   }
+  ]
+ },
+ "none": {
+  "comment": "HRKEY1 {\"v\":1,\"mode\":\"none\"}"
+ }
+}

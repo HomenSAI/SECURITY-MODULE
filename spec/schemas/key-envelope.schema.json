@@ -1,0 +1,81 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/HomenSAI/SECURITY-MODULE/spec/schemas/key-envelope.schema.json",
+ "$comment": "HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI",
+ "title": "Конверт ключа копии HRKEY1 (JSON после префикса «HRKEY1 » в комментарии внешнего ZIP)",
+ "description": "См. spec/key-envelope.md. Пишет app/archive/keys.py seal/open_comment; читает envelope_from_comment/open_password.",
+ "oneOf": [
+  {
+   "type": "object",
+   "required": ["v", "mode"],
+   "additionalProperties": false,
+   "properties": {"v": {"const": 1}, "mode": {"const": "none"}}
+  },
+  {
+   "type": "object",
+   "required": ["v", "mode", "kid", "pub", "epk", "nonce", "ct", "wrapped"],
+   "additionalProperties": false,
+   "properties": {
+    "v": {"const": 1},
+    "mode": {"enum": ["generated", "custom", "pin"]},
+    "kid": {"$ref": "#/$defs/hr1"},
+    "pub": {"$ref": "#/$defs/b64u32"},
+    "epk": {"$ref": "#/$defs/b64u32"},
+    "nonce": {"$ref": "#/$defs/b64u12"},
+    "ct": {"$ref": "#/$defs/b64u", "description": "ChaCha20-Poly1305(секрет копии 44 знака ASCII) — 60 байт"},
+    "wrapped": {"$ref": "#/$defs/wrapped"},
+    "recovery": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 13,
+     "items": {
+      "type": "object",
+      "required": ["id", "sealed"],
+      "additionalProperties": false,
+      "properties": {
+       "id": {"type": "string", "pattern": "^RK-[0-9A-F]{4}-[0-9A-F]{4}$"},
+       "sealed": {"$ref": "#/$defs/sealed"}
+      }
+     }
+    }
+   }
+  }
+ ],
+ "$defs": {
+  "b64u": {"type": "string", "pattern": "^[A-Za-z0-9_-]*={0,2}$", "maxLength": 512},
+  "b64u12": {"type": "string", "pattern": "^[A-Za-z0-9_-]{16}$"},
+  "b64u16": {"type": "string", "pattern": "^[A-Za-z0-9_-]{22}==$"},
+  "b64u32": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}=$"},
+  "b64u48": {"type": "string", "pattern": "^[A-Za-z0-9_-]{64}$"},
+  "hr1": {"type": "string", "pattern": "^HR1-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$"},
+  "wrapped": {
+   "title": "Закрытый ключ хозяйства X25519 под паролем/PIN: Argon2id → ChaCha20-Poly1305",
+   "type": "object",
+   "required": ["v", "kdf", "m", "t", "p", "salt", "nonce", "ct"],
+   "additionalProperties": false,
+   "properties": {
+    "v": {"const": 1},
+    "kdf": {"const": "argon2id"},
+    "m": {"type": "integer", "minimum": 19456, "maximum": 1048576},
+    "t": {"type": "integer", "minimum": 2, "maximum": 32},
+    "p": {"type": "integer", "minimum": 1, "maximum": 16},
+    "salt": {"$ref": "#/$defs/b64u16"},
+    "nonce": {"$ref": "#/$defs/b64u12"},
+    "ct": {"$ref": "#/$defs/b64u48"}
+   }
+  },
+  "sealed": {
+   "title": "Закрытый ключ хозяйства, запечатанный на получателя «ключ восстановления»",
+   "type": "object",
+   "required": ["v", "rpk", "epk", "nonce", "ct"],
+   "additionalProperties": false,
+   "properties": {
+    "v": {"const": 1},
+    "rpk": {"$ref": "#/$defs/b64u32"},
+    "epk": {"$ref": "#/$defs/b64u32"},
+    "nonce": {"$ref": "#/$defs/b64u12"},
+    "ct": {"$ref": "#/$defs/b64u48"}
+   }
+  }
+ }
+}

@@ -1,0 +1,667 @@
+{
+ "$comment": "HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI",
+ "description": "Коды ошибок копий, восстановления, ключей восстановления и цепочки копий. Выписка из справочника ошибок Rent (app/errorbook: data_archive.py, data_security.py). Полные тексты «Что делать» RU/UK — там же; единый справочник модуля — пункт MOD.errors-help.",
+ "source": "HomenSAI/Homensai-Rent app/errorbook/public_api.py catalog()",
+ "codes": [
+  {
+   "code": "corrupt",
+   "level": "error",
+   "area": "sqlite",
+   "where": "restore",
+   "title": {
+    "ru": "Архив повреждён или не в формате Rent",
+    "uk": "Архів пошкоджено або він не у форматі Rent"
+   }
+  },
+  {
+   "code": "checksum",
+   "level": "error",
+   "area": "sqlite",
+   "where": "restore",
+   "title": {
+    "ru": "Контрольная сумма файла в архиве не совпала",
+    "uk": "Контрольна сума файлу в архіві не збіглася"
+   }
+  },
+  {
+   "code": "fingerprint",
+   "level": "error",
+   "area": "sqlite",
+   "where": "restore",
+   "title": {
+    "ru": "Содержимое восстановленной базы не совпало с контрольными итогами архива",
+    "uk": "Вміст відновленої бази не збігся з контрольними підсумками архіву"
+   }
+  },
+  {
+   "code": "db_corrupt",
+   "level": "danger",
+   "area": "sqlite",
+   "where": "restore",
+   "title": {
+    "ru": "База внутри архива повреждена (проверка целостности или внешние ключи)",
+    "uk": "База всередині архіву пошкоджена (перевірка цілісності або зовнішні ключі)"
+   }
+  },
+  {
+   "code": "source_corrupt",
+   "level": "danger",
+   "area": "sqlite",
+   "where": "backup",
+   "title": {
+    "ru": "База повреждена: копия не сделана, прежние копии сохранены",
+    "uk": "База пошкоджена: копію не зроблено, попередні копії збережено"
+   }
+  },
+  {
+   "code": "drill_no_copy",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Для учебного восстановления не найдено ни одной копии",
+    "uk": "Для навчального відновлення не знайдено жодної копії"
+   }
+  },
+  {
+   "code": "drill_failed",
+   "level": "error",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Учебное восстановление не удалось",
+    "uk": "Навчальне відновлення не вдалося"
+   }
+  },
+  {
+   "code": "no_password",
+   "level": "error",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Не задан пароль архива",
+    "uk": "Не задано пароль архіву"
+   }
+  },
+  {
+   "code": "weak_password",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Пароль архива слабый: короткий или из шаблона",
+    "uk": "Пароль архіву слабкий: короткий або з шаблону"
+   }
+  },
+  {
+   "code": "db_missing",
+   "level": "error",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Файл базы не найден",
+    "uk": "Файл бази не знайдено"
+   }
+  },
+  {
+   "code": "excel_failed",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Не удалось собрать выгрузку Excel для копии",
+    "uk": "Не вдалося зібрати вивантаження Excel для копії"
+   }
+  },
+  {
+   "code": "files_failed",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Не удалось прочитать файлы счетов из архива файлов",
+    "uk": "Не вдалося прочитати файли рахунків з архіву файлів"
+   }
+  },
+  {
+   "code": "build_failed",
+   "level": "error",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Не удалось собрать архив",
+    "uk": "Не вдалося зібрати архів"
+   }
+  },
+  {
+   "code": "folder_unavailable",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Папка копий недоступна: диск не подключён или нет прав",
+    "uk": "Тека копій недоступна: диск не підключено або немає прав"
+   }
+  },
+  {
+   "code": "folder_failed",
+   "level": "error",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Не удалось записать копию в папку",
+    "uk": "Не вдалося записати копію в теку"
+   }
+  },
+  {
+   "code": "telegram_token",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Не задан токен бота для отправки копии в Telegram",
+    "uk": "Не задано токен бота для надсилання копії в Telegram"
+   }
+  },
+  {
+   "code": "telegram_failed",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Telegram не принял архив",
+    "uk": "Telegram не прийняв архів"
+   }
+  },
+  {
+   "code": "telegram_too_large",
+   "level": "info",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Архив больше 50 МБ: в Telegram не отправлен",
+    "uk": "Архів більший за 50 МБ: у Telegram не надіслано"
+   }
+  },
+  {
+   "code": "no_key_mode",
+   "level": "info",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Проверка пароля нужна только в режиме с паролем или PIN",
+    "uk": "Перевірка пароля потрібна лише в режимі з паролем або PIN"
+   }
+  },
+  {
+   "code": "restore_failed",
+   "level": "error",
+   "area": "app",
+   "where": "restore",
+   "title": {
+    "ru": "База не восстановлена",
+    "uk": "Базу не відновлено"
+   }
+  },
+  {
+   "code": "no_copies",
+   "level": "warning",
+   "area": "app",
+   "where": "restore",
+   "title": {
+    "ru": "В папках копий нет архивов для учебного восстановления",
+    "uk": "У теках копій немає архівів для навчального відновлення"
+   }
+  },
+  {
+   "code": "services_running",
+   "level": "warning",
+   "area": "app",
+   "where": "restore",
+   "title": {
+    "ru": "Веб, бот или планировщик ещё работают",
+    "uk": "Веб, бот або планувальник ще працюють"
+   }
+  },
+  {
+   "code": "parts_mismatch",
+   "level": "error",
+   "area": "app",
+   "where": "restore",
+   "title": {
+    "ru": "Части архива не складываются в исходный файл",
+    "uk": "Частини архіву не складаються в початковий файл"
+   }
+  },
+  {
+   "code": "no_destination",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Не настроено, куда класть копию",
+    "uk": "Не налаштовано, куди класти копію"
+   }
+  },
+  {
+   "code": "interrupted",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Запуск копии оборван: процесс остановили до конца",
+    "uk": "Запуск копії обірвано: процес зупинили до кінця"
+   }
+  },
+  {
+   "code": "bad_settings",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Неверные настройки архива",
+    "uk": "Неправильні налаштування архіву"
+   }
+  },
+  {
+   "code": "bad_protection",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Неверные настройки защиты копий",
+    "uk": "Неправильні налаштування захисту копій"
+   }
+  },
+  {
+   "code": "already_running",
+   "level": "info",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Архив уже собирается другим запуском",
+    "uk": "Архів уже збирається іншим запуском"
+   }
+  },
+  {
+   "code": "not_confirmed",
+   "level": "warning",
+   "area": "app",
+   "where": "backup",
+   "title": {
+    "ru": "Не отмечены обязательные подтверждения",
+    "uk": "Не позначено обов’язкові підтвердження"
+   }
+  },
+  {
+   "code": "recovery_limit",
+   "level": "warning",
+   "area": "app",
+   "where": "recovery",
+   "title": {
+    "ru": "Ключей восстановления уже три",
+    "uk": "Ключів відновлення вже три"
+   }
+  },
+  {
+   "code": "recovery_name",
+   "level": "warning",
+   "area": "app",
+   "where": "recovery",
+   "title": {
+    "ru": "Имя ключа восстановления — от 1 до 60 знаков",
+    "uk": "Назва ключа відновлення — від 1 до 60 знаків"
+   }
+  },
+  {
+   "code": "recovery_unknown",
+   "level": "warning",
+   "area": "app",
+   "where": "recovery",
+   "title": {
+    "ru": "Такого ключа восстановления нет",
+    "uk": "Такого ключа відновлення немає"
+   }
+  },
+  {
+   "code": "chain_failed",
+   "level": "warning",
+   "area": "app",
+   "where": "chain",
+   "title": {
+    "ru": "Копия сохранена, но запись цепочки не создана",
+    "uk": "Копію збережено, але запис ланцюжка не створено"
+   }
+  },
+  {
+   "code": "os_files",
+   "level": "info",
+   "area": "app",
+   "where": "chain",
+   "title": {
+    "ru": "В папке цепочки копий служебные файлы ОС",
+    "uk": "У теці ланцюжка копій службові файли ОС"
+   }
+  },
+  {
+   "code": "copy_unchained",
+   "level": "warning",
+   "area": "app",
+   "where": "chain",
+   "title": {
+    "ru": "Своя копия без записи в цепочке",
+    "uk": "Власна копія без запису в ланцюжку"
+   }
+  },
+  {
+   "code": "key_changed",
+   "level": "warning",
+   "area": "app",
+   "where": "chain",
+   "title": {
+    "ru": "Ключ подписи цепочки сменился",
+    "uk": "Ключ підпису ланцюжка змінився"
+   }
+  },
+  {
+   "code": "medium_unavailable",
+   "level": "info",
+   "area": "app",
+   "where": "chain",
+   "title": {
+    "ru": "Носитель недоступен",
+    "uk": "Носій недоступний"
+   }
+  },
+  {
+   "code": "recovery_format",
+   "level": "warning",
+   "area": "access",
+   "where": "recovery",
+   "title": {
+    "ru": "Это не похоже на ключ восстановления",
+    "uk": "Це не схоже на ключ відновлення"
+   }
+  },
+  {
+   "code": "recovery_checksum",
+   "level": "warning",
+   "area": "access",
+   "where": "recovery",
+   "title": {
+    "ru": "В ключе восстановления опечатка: контрольная сумма не сходится",
+    "uk": "У ключі відновлення помилка: контрольна сума не збігається"
+   }
+  },
+  {
+   "code": "recovery_wrong",
+   "level": "warning",
+   "area": "access",
+   "where": "recovery",
+   "title": {
+    "ru": "Этот ключ восстановления не подходит к копиям хозяйства",
+    "uk": "Цей ключ відновлення не підходить до копій господарства"
+   }
+  },
+  {
+   "code": "shares_needed",
+   "level": "warning",
+   "area": "access",
+   "where": "recovery",
+   "title": {
+    "ru": "Нужны любые две части ключа из трёх",
+    "uk": "Потрібні будь-які дві частини ключа з трьох"
+   }
+  },
+  {
+   "code": "shares_mismatch",
+   "level": "warning",
+   "area": "access",
+   "where": "recovery",
+   "title": {
+    "ru": "Части от разных ключей не складываются",
+    "uk": "Частини від різних ключів не складаються"
+   }
+  },
+  {
+   "code": "kdf_params",
+   "level": "error",
+   "area": "access",
+   "where": "login",
+   "title": {
+    "ru": "Недопустимые параметры хэша пароля",
+    "uk": "Неприпустимі параметри хешу пароля"
+   }
+  },
+  {
+   "code": "bad_password",
+   "level": "warning",
+   "area": "access",
+   "where": "restore",
+   "title": {
+    "ru": "Неверный пароль архива",
+    "uk": "Неправильний пароль архіву"
+   }
+  },
+  {
+   "code": "drill_bad_password",
+   "level": "warning",
+   "area": "access",
+   "where": "restore",
+   "title": {
+    "ru": "Учебное восстановление: пароль копий не подошёл",
+    "uk": "Навчальне відновлення: пароль копій не підійшов"
+   }
+  },
+  {
+   "code": "current_password",
+   "level": "warning",
+   "area": "access",
+   "where": "backup",
+   "title": {
+    "ru": "Для смены режима защиты нужен текущий пароль копий",
+    "uk": "Для зміни режиму захисту потрібен поточний пароль копій"
+   }
+  },
+  {
+   "code": "check_locked",
+   "level": "error",
+   "area": "access",
+   "where": "restore",
+   "title": {
+    "ru": "5 неверных паролей подряд: пауза 10 минут",
+    "uk": "5 неправильних паролів поспіль: пауза 10 хвилин"
+   }
+  },
+  {
+   "code": "no_key",
+   "level": "warning",
+   "area": "access",
+   "where": "restore",
+   "title": {
+    "ru": "Копия зашифрована на ключ хозяйства: нужен пароль или PIN копий",
+    "uk": "Копію зашифровано на ключ господарства: потрібен пароль або PIN копій"
+   }
+  },
+  {
+   "code": "open_outside_pc",
+   "level": "danger",
+   "area": "privacy",
+   "where": "backup",
+   "title": {
+    "ru": "Копия без пароля или с PIN кладётся только на диски этого ПК",
+    "uk": "Копія без пароля або з PIN кладеться лише на диски цього ПК"
+   }
+  },
+  {
+   "code": "internal_same_disk",
+   "level": "warning",
+   "area": "privacy",
+   "where": "backup",
+   "title": {
+    "ru": "«Другой внутренний диск» на самом деле тот же диск, что и база",
+    "uk": "«Інший внутрішній диск» насправді той самий диск, що й база"
+   }
+  },
+  {
+   "code": "rotation_held",
+   "level": "warning",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Старые копии не удалены: цепочка копий нарушена",
+    "uk": "Старі копії не видалено: ланцюжок копій порушено"
+   }
+  },
+  {
+   "code": "chain_gap",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Пропущен номер копии в цепочке",
+    "uk": "Пропущено номер копії в ланцюжку"
+   }
+  },
+  {
+   "code": "chain_link",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Связь с предыдущей копией нарушена",
+    "uk": "Зв’язок із попередньою копією порушено"
+   }
+  },
+  {
+   "code": "chain_signature",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Подпись манифеста копии неверна",
+    "uk": "Підпис маніфесту копії неправильний"
+   }
+  },
+  {
+   "code": "manifest_missing",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Манифест копии отсутствует на носителе",
+    "uk": "Маніфест копії відсутній на носії"
+   }
+  },
+  {
+   "code": "manifest_differs",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Манифест на носителе изменён",
+    "uk": "Маніфест на носії змінено"
+   }
+  },
+  {
+   "code": "manifest_foreign",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "На носителе чужой манифест",
+    "uk": "На носії чужий маніфест"
+   }
+  },
+  {
+   "code": "medium_ahead",
+   "level": "warning",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "На носителе манифесты новее базы",
+    "uk": "На носії маніфести новіші за базу"
+   }
+  },
+  {
+   "code": "copy_missing",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Копия отсутствует",
+    "uk": "Копія відсутня"
+   }
+  },
+  {
+   "code": "copy_differs",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Копия изменена: хэш не совпадает с манифестом",
+    "uk": "Копію змінено: хеш не збігається з маніфестом"
+   }
+  },
+  {
+   "code": "copy_foreign",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "На носителе изменённый или чужой файл с именем копии",
+    "uk": "На носії змінений або чужий файл з іменем копії"
+   }
+  },
+  {
+   "code": "medium_link",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Папка копий или цепочки на носителе — ссылка на другую папку",
+    "uk": "Тека копій або ланцюжка на носії — посилання на іншу теку"
+   }
+  },
+  {
+   "code": "medium_moved",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Выбранная папка копий стала ссылкой или ведёт в другое место",
+    "uk": "Вибрана тека копій стала посиланням або веде в інше місце"
+   }
+  },
+  {
+   "code": "too_big",
+   "level": "warning",
+   "area": "danger",
+   "where": "restore",
+   "title": {
+    "ru": "Копия больше предела чтения",
+    "uk": "Копія більша за межу читання"
+   }
+  },
+  {
+   "code": "backup-password-check",
+   "level": "danger",
+   "area": "danger",
+   "where": "backup",
+   "title": {
+    "ru": "Просрочена проверка пароля копий",
+    "uk": "Прострочено перевірку пароля копій"
+   }
+  },
+  {
+   "code": "backup-chain-broken",
+   "level": "danger",
+   "area": "danger",
+   "where": "chain",
+   "title": {
+    "ru": "Цепочка копий нарушена: копия отсутствует или изменена",
+    "uk": "Ланцюжок копій порушено: копія відсутня або змінена"
+   }
+  }
+ ]
+}

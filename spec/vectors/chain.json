@@ -1,0 +1,49 @@
+{
+ "$comment": "HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI",
+ "note": "Тест-вектор. Все пароли, ключи и данные вымышленные; в работе не использовать.",
+ "spec": "spec/README.md",
+ "signing_seed_hex": "01b23ec94d55102b482b1ed2b8afc9521ef14545c61c5c469338271404fca9dc",
+ "public_b64url": "K0qQ-5hThEpIr632TVyfse5_Qbt6-A9ks0INLj135xM=",
+ "signer": "HS1-B934-E570-55C1-0124",
+ "key_file_linux": "HRSIGN1 raw AbI-yU1VECtIKx7SuK_JUh7xRUXGHFxGkzgnFAT8qdw=",
+ "manifests": [
+  {
+   "file": "000001.json",
+   "text": "{\"manifest\":{\"archive\":\"2026-01-15_HomensaiRent_Archive.zip\",\"created_at\":\"2026-01-15T03:00:00Z\",\"encryption\":{\"kid\":\"HR1-7E9C-9C11-7760-EF7A\",\"mode\":\"custom\"},\"format\":\"homensai-rent-chain/1\",\"media\":[\"external\",\"internal\"],\"path\":\"2026/01/2026-01-15_HomensaiRent_Archive.zip\",\"prev\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"rent_version\":\"0.0.0-vector\",\"schema\":\"migrations:0\",\"seq\":1,\"sha256\":\"52125879151c63370a2e6348c2ddf7e339203a2292a06650df86e9c5f7bb0ce7\",\"signer\":\"HS1-B934-E570-55C1-0124\",\"size\":2194,\"start\":true},\"signature\":\"v5Rd4Rg2wQMc1nwzXI91H1GIzHpaIadCM1bOyeKVr9Sz4V9rWK4DTkXLwf6GVg2-UHxbQm0ookNaEsFzSaQoBw==\"}",
+   "manifest_sha256": "673b6c30b104f8079070239d952176c82c2fbca347bf05fad5ecec46db86461b",
+   "signature_b64url": "v5Rd4Rg2wQMc1nwzXI91H1GIzHpaIadCM1bOyeKVr9Sz4V9rWK4DTkXLwf6GVg2-UHxbQm0ookNaEsFzSaQoBw=="
+  },
+  {
+   "file": "000002.json",
+   "text": "{\"manifest\":{\"archive\":\"2026-01-15_HomensaiRent_Archive.zip\",\"created_at\":\"2026-01-16T03:00:00Z\",\"encryption\":{\"kid\":\"HR1-7E9C-9C11-7760-EF7A\",\"mode\":\"custom\"},\"format\":\"homensai-rent-chain/1\",\"integrity\":{\"journal_hash\":\"b77189483e6bad040f28d397cd2b848913ec2aa33e8051198e132274db99b070\",\"journal_seq\":2},\"media\":[\"external\",\"internal\"],\"path\":\"2026/01/2026-01-15_HomensaiRent_Archive.zip\",\"prev\":\"673b6c30b104f8079070239d952176c82c2fbca347bf05fad5ecec46db86461b\",\"rent_version\":\"0.0.0-vector\",\"schema\":\"migrations:0\",\"seq\":2,\"sha256\":\"52125879151c63370a2e6348c2ddf7e339203a2292a06650df86e9c5f7bb0ce7\",\"signer\":\"HS1-B934-E570-55C1-0124\",\"size\":2194,\"start\":false},\"signature\":\"WnNWYy8dkT-jusWhHnesD1SvIURcTl5BKFbBJdBtVa5c02xFcTLWRL29YeIsXzL7PrlZ8pQ0PDQYL_GmiQFIDw==\"}",
+   "manifest_sha256": "128a36b6b7090115fe37b20a401c0c0212e343b2658f3200a9946ef357de9ca2",
+   "signature_b64url": "WnNWYy8dkT-jusWhHnesD1SvIURcTl5BKFbBJdBtVa5c02xFcTLWRL29YeIsXzL7PrlZ8pQ0PDQYL_GmiQFIDw=="
+  }
+ ],
+ "tampered": {
+  "text": "{\"manifest\":{\"archive\":\"2026-01-15_HomensaiRent_Archive.zip\",\"created_at\":\"2026-01-15T03:00:00Z\",\"encryption\":{\"kid\":\"HR1-7E9C-9C11-7760-EF7A\",\"mode\":\"custom\"},\"format\":\"homensai-rent-chain/1\",\"media\":[\"external\",\"internal\"],\"path\":\"2026/01/2026-01-15_HomensaiRent_Archive.zip\",\"prev\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"rent_version\":\"0.0.0-vector\",\"schema\":\"migrations:0\",\"seq\":1,\"sha256\":\"52125879151c63370a2e6348c2ddf7e339203a2292a06650df86e9c5f7bb0ce7\",\"signer\":\"HS1-B934-E570-55C1-0124\",\"size\":2195,\"start\":true},\"signature\":\"v5Rd4Rg2wQMc1nwzXI91H1GIzHpaIadCM1bOyeKVr9Sz4V9rWK4DTkXLwf6GVg2-UHxbQm0ookNaEsFzSaQoBw==\"}",
+  "signature_valid": false
+ },
+ "journal": [
+  {
+   "seq": 1,
+   "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+   "payload": {
+    "kind": "snapshot",
+    "note": "вымышленная запись 1"
+   },
+   "hash": "ba1dc9626b2d6d90bf6c904f27140b7fe6db6f45319cbc6aab5fc326f14c8c6e"
+  },
+  {
+   "seq": 2,
+   "prev": "ba1dc9626b2d6d90bf6c904f27140b7fe6db6f45319cbc6aab5fc326f14c8c6e",
+   "payload": {
+    "kind": "tx",
+    "tables": [
+     "units"
+    ]
+   },
+   "hash": "b77189483e6bad040f28d397cd2b848913ec2aa33e8051198e132274db99b070"
+  }
+ ]
+}

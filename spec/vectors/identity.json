@@ -1,0 +1,55 @@
+{
+ "$comment": "HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI",
+ "note": "Тест-вектор. Все пароли, ключи и данные вымышленные; в работе не использовать.",
+ "spec": "spec/README.md",
+ "cases": [
+  {
+   "name": "custom-password",
+   "mode": "password",
+   "password": "Пример-пароль-копий-2026",
+   "private_hex": "ad48772959ec217a7f6d9209535bf34cfa6eeddb3d783f64bb85fd87330a5419",
+   "public": "t18bpKxiHxlK4aOSw24qt6ezwW7fiEjDSJIIzfriWhw=",
+   "fingerprint": "HR1-7E9C-9C11-7760-EF7A",
+   "wrapped": {
+    "v": 1,
+    "kdf": "argon2id",
+    "m": 65536,
+    "t": 3,
+    "p": 4,
+    "salt": "2qsUx1VBwioR2KF-hbYXuw==",
+    "nonce": "qffe9189jjzbArxA",
+    "ct": "AmhQS2Y4H2j22aKr97dB24QDHUG8wVgcSz3yoBLOdCsP-z71vPa7XuQ7yHGifEh7"
+   },
+   "errors": [
+    {
+     "password": "Пример-пароль-копий-2026x",
+     "code": "bad_password"
+    }
+   ]
+  },
+  {
+   "name": "pin",
+   "mode": "pin",
+   "password": "4826",
+   "private_hex": "83ddb2a6bcd4e683cf71a1f7635fd043e0647f635771d0468ec482107bdb6782",
+   "public": "ER8rgMXolvIhnhLqziIxMBvIUGr5BFtLsTIPgqdnbD8=",
+   "fingerprint": "HR1-B508-8738-95FD-9BCA",
+   "wrapped": {
+    "v": 1,
+    "kdf": "argon2id",
+    "m": 65536,
+    "t": 8,
+    "p": 4,
+    "salt": "l5kXqYZrHJRFaMOcuYnoNg==",
+    "nonce": "ILmd5Cd4nmvLV9sT",
+    "ct": "jKYX4KCV7hpIfhWYRZen0iLI-QScbCl4AUK3Kd72Va_EzmovTQ3uo9C3b9v1Om3K"
+   },
+   "errors": [
+    {
+     "password": "4826x",
+     "code": "bad_password"
+    }
+   ]
+  }
+ ]
+}

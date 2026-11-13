@@ -1,0 +1,159 @@
+{
+ "$comment": "HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI",
+ "note": "Тест-вектор. Все пароли, ключи и данные вымышленные; в работе не использовать.",
+ "spec": "spec/README.md",
+ "cases": [
+  {
+   "name": "keyed-custom",
+   "mode": "custom",
+   "file_name": "2026-01-15_HomensaiRent_Archive.zip",
+   "file_b64": "UEsDBBQAAQBjAAAYL1wAAAAAKgUAAA4FAAALAAsAYXJjaGl2ZS56aXABmQcAAgBBRQMAAKOnKXtKzf82tsKAAmpF9mAeHKl0owocovKwyP3MpMdmMP4kTOmuiH7f7v6v524aoBosxeX71Cpv4f9i6WZ0Jv4Q48/GwwZXvEP8QIcNgIJbkxVyDW3Qm/OP6nrsO2nX8k/R0neoSZaNpE07WMZDzzQWlweAwOXwDEdTqGqOqKUprL1+fAUIFQu0YfAJzxbv6TdhdMrzJ7sHufATo0dJg7NX1NTA0Fe+7+FYgs2IediQhDALnaLkHy+OGHkZVXIKyWe8dZcsjIpdjQqo6Hjbe42vDGvI1+MCyYDEmIix/tCvKPudjwR6EUBdWbBhbLqowtqWpbFA4Y4QqI0yhVJ19kaflDFhH27JnvAR9oAxzkZJO/N2+HRcLaaIhivD+KJtkkA9IFX34782orxZbvWoLL38V/TE/v+fC488WM5cqbyO2rSidOxUIeZebGxc7VGvkXHcTOUbRyjEibWTiZZTiMKGccN7wmNDqE5DGzYq6YHJOD9bjvQbUPQS7XkI3lsFbO9SJd9WOlqOp7195wjoUmOLBIxj+24jf4FBDCVbCIXkw9N0uvfL1Y8YGHQ50eAKU1ZOH/LyAiGOOrMswQxsR/eFD+OuE0ONPXtikHLZAtKIX8W105THZaKWSQw/1X4za6EWAbjd4pV+ReCgY0WqM7QQ70imMvqRiaPsVjhNm6Cqo/Qz6bjB5D54+DyW+gY1SI4G3i/gVT6Ho2vVFlNovCyNYniyR/7+QDQwPOMLY9KSIukAqCKMTfWFu/Uoii+1/RFclNTOjpodmtQhUTUdMzJRtfDpvDmIPk0+GA9owCF3nMQeWs9LH2OghFXMb9G+CUJCu+fpvOUlBc8LtH0KN26L7WIW4et8eS/OcHn/xnJDq1EmCPZkZ1y1FXwo7rEDqPYVxz5jUnGQfGYUTOhfV+f+3HhNta8Ud49+F8+qXwY+ID5bNJLQgpmpiFQibj6m26621ytQdEmwPFmGj4VCzGsbu4KpLFbMkHZGegiG6Z+Ucn/X0/1Avpgof/We1FtMhZEPwh2z1AFBIfTmHX5fWDC/4L4sDs+4dpaykmcREQWJ3h1tBr4Hp3pzVsDQKC+VLIz0lUUclqsz3rE7HpqQ6TTIKvTAQbk0Z0s6a3Y/FjZb8Nji9lN6NHYPg12KT4aQcMSg7YV1eH8YyRjGz5wwziufUbsEkMEPMlaHGjq7dCPTU44sOf2HZfbxp3giG4RjAJ/iCn0GCgxwcuNR6+Fp54JXZzjDRpnyWDA8Kx1H1FfeNDtesfy3pk30H/50wMKGo04TITH8gbQUuKlMUw2UoOafLGM7+NGxKkzd0pFHJmh89cSkabvgySYvN1wC0C9rA3ubR0FZfpaJ/1+5xEoVdhMM4PzVvJY16MxdpddLzsQ5tbXOjHOAXh/XtplMvnWucY/e9wG8CllUxXSUv6QWprSUwuuN4x5EOubdkapSccamY5MBB51kan4bYHYzAGWO8U8w6tqMBbeFiCFXH91tbwl6zx/dDGAlw750lRRtrEE/JC5m0mv/jU+kXEH90A338r787AFsitmBbLMQ37kn6/yTt4a3djAESD+CPiqH4H1NQtMh9rzLirzzW0MZMphu4duufl7Ecwmg6GsYItFTnZwMb3/Q4nmg59d01JxpEX1I1JTTFBTDtK3qfVyh4cB6PDPmnlNELaGQnowuFp1z7IM6w2xeBWYFsoHGQ5KCg2nBTCyES+HTL5iZVpm2SKfmLL4zst2oaXF11B+6SjmWhd0/V6e2KYWsWOzqUEsBAhQDFAABAGMAABgvXAAAAAAqBQAADgUAAAsACwAAAAAAAAAAAIABAAAAAGFyY2hpdmUuemlwAZkHAAIAQUUDAABQSwUGAAAAAAEAAQBEAAAAXgUAANoCSFJLRVkxIHsiY3QiOiItRFlva2k0MWlnY0c5UE1Gc1NwemxrczdpRWhnNWIxLVdjcVRPT2NPc0FCWEVZaTBMTUhST3g5Z2xsUXRYZHIyenNVLWM2ZkpsMXZFMWIyNyIsImVwayI6Im1NMjNoSDloTWVqcG05U1FlVWsta0dxQ2Y2bG0yNVl1Ti1vU3E5ZGlKUkk9Iiwia2lkIjoiSFIxLTdFOUMtOUMxMS03NzYwLUVGN0EiLCJtb2RlIjoiY3VzdG9tIiwibm9uY2UiOiI5dk9kdHpUZlFaVVJsUTJaIiwicHViIjoidDE4YnBLeGlIeGxLNGFPU3cyNHF0NmV6d1c3ZmlFakRTSklJemZyaVdodz0iLCJyZWNvdmVyeSI6W3siaWQiOiJSSy1BREVCLTM2QjciLCJzZWFsZWQiOnsiY3QiOiJFWGtubEdYUFZYUHhhV2V5UDYxZjN0b1hGbFJhb2lXS3VYNjRhTkdNSjJEb1ZuNHplMHpxaU9NLXU0bFF6YmxOIiwiZXBrIjoiMDhSR18tRmt5R0I0ZWFibW1QUkFXWG5BT3RQUnpzVTI5TF8zSW52NnJBMD0iLCJub25jZSI6ImNVUFdJYWplay1LSmpDTUYiLCJycGsiOiI4RTViTFQ2cGJxcUx6anlJcVJxVFQ2RktkX0ZxbTAyYXp6Zks2OGNHYnpNPSIsInYiOjF9fV0sInYiOjEsIndyYXBwZWQiOnsiY3QiOiJBbWhRUzJZNEgyajIyYUtyOTdkQjI0UURIVUc4d1ZnY1N6M3lvQkxPZENzUC16NzF2UGE3WHVRN3lIR2lmRWg3Iiwia2RmIjoiYXJnb24yaWQiLCJtIjo2NTUzNiwibm9uY2UiOiJxZmZlOTE4OWpqemJBcnhBIiwicCI6NCwic2FsdCI6IjJxc1V4MVZCd2lvUjJLRi1oYllYdXc9PSIsInQiOjMsInYiOjF9fQ==",
+   "file_sha256": "52125879151c63370a2e6348c2ddf7e339203a2292a06650df86e9c5f7bb0ce7",
+   "size": 2194,
+   "open_with": "Пример-пароль-копий-2026",
+   "zip_password": "4O_LSsKLzQh76U0zbSPpMD9nBKKAkFKGA5LBQhkt59E=",
+   "inner_sha256": "0207831eda5847f245077c66c6c54c884bd474b461cb969e6c91314b4c14640e",
+   "manifest": {
+    "format": "homensai-rent-archive/1",
+    "created_at": "2026-01-15T03:00:00Z",
+    "on": "2026-01-15",
+    "rent_version": "0.0.0-vector",
+    "warnings": [],
+    "file_scope": "registered attachments; invoices within selected months; no keys or unregistered files",
+    "invoice_months": [],
+    "applied_migrations": [],
+    "content_fingerprint": {
+     "counts": {},
+     "payments_minor": {},
+     "audit_last": null
+    },
+    "files": [
+     {
+      "path": "Export/HomensaiRent_Export_2026-01-15.xlsx",
+      "kind": "excel",
+      "size": 79,
+      "sha256": "250a1c1fb9bbc1643d5a6a2f6f67ff1ccfbb4360b3e3d788a24fdbc70369724f"
+     },
+     {
+      "path": "Database/rent.sqlite3",
+      "kind": "database",
+      "size": 58,
+      "sha256": "36df57af35839228a2254fb497eb39d6dc42cdf3d2e6081575aadd3ad6495840"
+     }
+    ]
+   },
+   "check_db": false,
+   "errors": [
+    {
+     "input": "Пример-пароль-копий-2026x",
+     "code": "bad_password"
+    },
+    {
+     "flip_byte_at": 92,
+     "input": "Пример-пароль-копий-2026",
+     "code": "corrupt"
+    }
+   ]
+  },
+  {
+   "name": "legacy-env",
+   "mode": "env",
+   "file_name": "2026-01-15_HomensaiRent_Archive.zip",
+   "file_b64": "UEsDBBQAAQBjAAAYL1wAAAAAKgUAAA4FAAALAAsAYXJjaGl2ZS56aXABmQcAAgBBRQMAAIJ4CbWsDUjycxA7s3Jh5ov6p9e/w/cBNtyuM4cE60Jku7WAzFRCAWxs2aDSm2SqMMsxneSkwrucSyB/jpsviFcXAbd445l7SfEkg7OTEx1LTjZtyFMqKkClSFGQJf3xcaNjstDpIuqXx0roBJIEmkjwvipq/UPIKk7yKABr4qfF5SR0U4iJSgHtfc/XI5nXRLxdPF7hJeg1f4GrgzqsPkmM60qR4n2Q9R/fW5V5aGB9mwL7WflMNgRNkxx/sDVLmPLJ5UfmfDY5UV6+MKSwDDXkv1f+hlnyAJlHBLMaQXimM6apxUuv5uq0Pt6HJm9QFANkk7Q+Y8Gtr26x5vICs5MJHsv/tMCV7VTyZwt9CzB6iyrWrR41rtz1phvehO4KtcrRnTsK89hvMcF60i7U6fNJSNexuZkO2mxis1PAmFdwV4nv0e7HE+/AwvvRPWqk2fW+7Yd68oQM5CYHrr83GHke4w7+UAQeD0V/IABlXo5qJdcuyCe93LqKegs/JMDZzE3k704AdoosoGevdOmX5alRCSdR1fF1tJ0ZxBwn1Os6SIgGjAadpVlJDTTWZtKRFQsDp99MZTylvAxoydMogTvnVENgBQAQhePuw4CfwkEOy4mzMETWc44SsOt3lc+vyxDBPlNSG/jFqehPMfKt4JdDskV/RkeHvDg9vJaDJhlCDKGoeCe6NQ+byOQSPrMld/vRYa6aaqshSrHPVZVPgPAjQ0MsN4ccshDBrXcvszyxTA+z9kd42wxtTZNjQRu6d648vdDty3et3ZObprsgGJgtZn/xnzQEMEy9bNfY9sluIhwJ3MEr1jc5LdBGhTbpr91mwozhekv1HFy2BbvdXOtUcEKq6hFifeWeW9I0sTZaiAO7mYmMW6uSUjQn0h0+Y9T77zZIK/oIX8sJAsyZFev+9O7/iOUWZYtMFmlVzggfK7F2QPWnD7S4EaVMN6TQc0OYh+zYre8+L3+c7BRTgQTwNbh37f4Lg3RwLlj0kXvMwBw1fqcCzgv29xxVTzUxJtKNLAzphTjPnrq+w8bNSpNV9jHspBgQaAuW4kaY6anNsFDHzZiESuVpGQJBGz7uiTgCE1Et3qm6DDKuVCNa9jmpIOhbYzK8/Y8dFwsA6orgjzJXr9SUV0ODDmRD/2iYHtfpRu68r1fM0GM3mRjA78GmUNudC8kyJcVkcFZOdUztzk8ynsiQ8cgAgmUhFA4pso5B+HZZyifPS14e1egQ/pifd1l7sxdrjobP7sdHn/OAR3bblx9QiFh3xrT67vuUDr/D3akzxeeLBMZNzDL/TmwYcyr5UMN7V/s20VHKg5K+x1DdxbHKGjEzUj8dHZ6rstG8DXJtoK/DOBjxDA1QUvZCaXH/cF+STgDh35q7Pgkve+kvCHN1KMxLvjoUXTDOywnO5cKhKUxO99FDaCWhkfFfd3rq0XR7EELV3biV6NBdkjcaSXBbe/+CbV8aNEAVB/ks6SfBXS2fRxhsATMnRGOMl/JIK/uPvhCjYZ+DmU7TFeXXpvE4QVCHblsOTC/R8dCBOsPvkOR9bf7+vBiEIXA/0gs0V6TDQStnHPJ1p0TqEVB2r0DXpAbfGET3HMXzpJL9eZJEC+op2UPTPOx+RdzvjN3OlTxbQYbQMIIERej+F3PjLOm//ej2fDowZeMMdDH7ROrBto+hLUUsrwBe4HkAfS9on23Q2gR673U87Kh1teLU4UZduzqdxFSCf1D8JwtsyLv9Of61deceokvmjCeCah9Kw4r583UFUEsBAhQDFAABAGMAABgvXAAAAAAqBQAADgUAAAsACwAAAAAAAAAAAIABAAAAAGFyY2hpdmUuemlwAZkHAAIAQUUDAABQSwUGAAAAAAEAAQBEAAAAXgUAAAAA",
+   "file_sha256": "0bad1d42a08163f11e53fbf814b935f813cff3d35a4e4407515eec9847dbd1df",
+   "size": 1464,
+   "open_with": "Пример-BACKUP-пароль-2026!",
+   "zip_password": "Пример-BACKUP-пароль-2026!",
+   "inner_sha256": "0207831eda5847f245077c66c6c54c884bd474b461cb969e6c91314b4c14640e",
+   "manifest": {
+    "format": "homensai-rent-archive/1",
+    "created_at": "2026-01-15T03:00:00Z",
+    "on": "2026-01-15",
+    "rent_version": "0.0.0-vector",
+    "warnings": [],
+    "file_scope": "registered attachments; invoices within selected months; no keys or unregistered files",
+    "invoice_months": [],
+    "applied_migrations": [],
+    "content_fingerprint": {
+     "counts": {},
+     "payments_minor": {},
+     "audit_last": null
+    },
+    "files": [
+     {
+      "path": "Export/HomensaiRent_Export_2026-01-15.xlsx",
+      "kind": "excel",
+      "size": 79,
+      "sha256": "250a1c1fb9bbc1643d5a6a2f6f67ff1ccfbb4360b3e3d788a24fdbc70369724f"
+     },
+     {
+      "path": "Database/rent.sqlite3",
+      "kind": "database",
+      "size": 58,
+      "sha256": "36df57af35839228a2254fb497eb39d6dc42cdf3d2e6081575aadd3ad6495840"
+     }
+    ]
+   },
+   "check_db": false,
+   "errors": [
+    {
+     "input": "Пример-BACKUP-пароль-2026!x",
+     "code": "bad_password"
+    },
+    {
+     "flip_byte_at": 92,
+     "input": "Пример-BACKUP-пароль-2026!",
+     "code": "corrupt"
+    }
+   ]
+  },
+  {
+   "name": "open-none",
+   "mode": "none",
+   "file_name": "2026-01-15_HomensaiRent_Archive.zip",
+   "file_b64": "UEsDBBQAAAAAAAAYL1x5I5ijDgUAAA4FAAALAAAAYXJjaGl2ZS56aXBQSwMEFAAAAAAAABgvXCVc8jtPAAAATwAAACoAAABFeHBvcnQvSG9tZW5zYWlSZW50X0V4cG9ydF8yMDI2LTAxLTE1Lnhsc3jQktGL0LzRi9GI0LvQtdC90L3QsNGPINCy0YvQs9GA0YPQt9C60LA6INC90LUg0L3QsNGB0YLQvtGP0YnQuNC5INGE0LDQudC7IHhsc3gKUEsDBBQAAAAAAAAYL1xZ0cw/OgAAADoAAAAVAAAARGF0YWJhc2UvcmVudC5zcWxpdGUzRmljdGlvbmFsIGRhdGFiYXNlIGJ5dGVzIGZvciB0aGUgdGVzdCB2ZWN0b3IgKG5vdCBTUUxpdGUpClBLAwQUAAAAAAAAGC9czkdMBvMCAADzAgAADQAAAG1hbmlmZXN0Lmpzb257CiAiZm9ybWF0IjogImhvbWVuc2FpLXJlbnQtYXJjaGl2ZS8xIiwKICJjcmVhdGVkX2F0IjogIjIwMjYtMDEtMTVUMDM6MDA6MDBaIiwKICJvbiI6ICIyMDI2LTAxLTE1IiwKICJyZW50X3ZlcnNpb24iOiAiMC4wLjAtdmVjdG9yIiwKICJ3YXJuaW5ncyI6IFtdLAogImZpbGVfc2NvcGUiOiAicmVnaXN0ZXJlZCBhdHRhY2htZW50czsgaW52b2ljZXMgd2l0aGluIHNlbGVjdGVkIG1vbnRoczsgbm8ga2V5cyBvciB1bnJlZ2lzdGVyZWQgZmlsZXMiLAogImludm9pY2VfbW9udGhzIjogW10sCiAiYXBwbGllZF9taWdyYXRpb25zIjogW10sCiAiY29udGVudF9maW5nZXJwcmludCI6IHsKICAiY291bnRzIjoge30sCiAgInBheW1lbnRzX21pbm9yIjoge30sCiAgImF1ZGl0X2xhc3QiOiBudWxsCiB9LAogImZpbGVzIjogWwogIHsKICAgInBhdGgiOiAiRXhwb3J0L0hvbWVuc2FpUmVudF9FeHBvcnRfMjAyNi0wMS0xNS54bHN4IiwKICAgImtpbmQiOiAiZXhjZWwiLAogICAic2l6ZSI6IDc5LAogICAic2hhMjU2IjogIjI1MGExYzFmYjliYmMxNjQzZDVhNmEyZjZmNjdmZjFjY2ZiYjQzNjBiM2UzZDc4OGEyNGZkYmM3MDM2OTcyNGYiCiAgfSwKICB7CiAgICJwYXRoIjogIkRhdGFiYXNlL3JlbnQuc3FsaXRlMyIsCiAgICJraW5kIjogImRhdGFiYXNlIiwKICAgInNpemUiOiA1OCwKICAgInNoYTI1NiI6ICIzNmRmNTdhZjM1ODM5MjI4YTIyNTRmYjQ5N2ViMzlkNmRjNDJjZGYzZDJlNjA4MTU3NWFhZGQzYWQ2NDk1ODQwIgogIH0KIF0KfVBLAQIUAxQAAAAAAAAYL1wlXPI7TwAAAE8AAAAqAAAAAAAAAAAAAACAAQAAAABFeHBvcnQvSG9tZW5zYWlSZW50X0V4cG9ydF8yMDI2LTAxLTE1Lnhsc3hQSwECFAMUAAAAAAAAGC9cWdHMPzoAAAA6AAAAFQAAAAAAAAAAAAAAgAGXAAAARGF0YWJhc2UvcmVudC5zcWxpdGUzUEsBAhQDFAAAAAAAABgvXM5HTAbzAgAA8wIAAA0AAAAAAAAAAAAAAIABBAEAAG1hbmlmZXN0Lmpzb25QSwUGAAAAAAMAAwDWAAAAIgQAAAAAUEsBAhQDFAAAAAAAABgvXHkjmKMOBQAADgUAAAsAAAAAAAAAAAAAAIABAAAAAGFyY2hpdmUuemlwUEsFBgAAAAABAAEAOQAAADcFAAAcAEhSS0VZMSB7InYiOjEsIm1vZGUiOiJub25lIn0=",
+   "file_sha256": "e2a61d6b49b4f9d5fa1f0f28afefef92e6e6c4b770977ac698dd6c92f1dc9e44",
+   "size": 1442,
+   "open_with": null,
+   "zip_password": null,
+   "inner_sha256": "0207831eda5847f245077c66c6c54c884bd474b461cb969e6c91314b4c14640e",
+   "manifest": {
+    "format": "homensai-rent-archive/1",
+    "created_at": "2026-01-15T03:00:00Z",
+    "on": "2026-01-15",
+    "rent_version": "0.0.0-vector",
+    "warnings": [],
+    "file_scope": "registered attachments; invoices within selected months; no keys or unregistered files",
+    "invoice_months": [],
+    "applied_migrations": [],
+    "content_fingerprint": {
+     "counts": {},
+     "payments_minor": {},
+     "audit_last": null
+    },
+    "files": [
+     {
+      "path": "Export/HomensaiRent_Export_2026-01-15.xlsx",
+      "kind": "excel",
+      "size": 79,
+      "sha256": "250a1c1fb9bbc1643d5a6a2f6f67ff1ccfbb4360b3e3d788a24fdbc70369724f"
+     },
+     {
+      "path": "Database/rent.sqlite3",
+      "kind": "database",
+      "size": 58,
+      "sha256": "36df57af35839228a2254fb497eb39d6dc42cdf3d2e6081575aadd3ad6495840"
+     }
+    ]
+   },
+   "check_db": false,
+   "errors": [
+    {
+     "flip_byte_at": 92,
+     "input": null,
+     "code": "corrupt"
+    }
+   ]
+  }
+ ]
+}
