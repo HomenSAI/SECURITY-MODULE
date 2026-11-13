@@ -1,0 +1,47 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/HomenSAI/SECURITY-MODULE/spec/schemas/archive-manifest.schema.json",
+ "$comment": "HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI",
+ "title": "Манифест копии homensai-rent-archive/1 (manifest.json внутреннего ZIP)",
+ "description": "См. spec/archive-format.md. Пишет app/archive/pack.py build_archive; читает _check_inner.",
+ "type": "object",
+ "required": ["format", "created_at", "on", "rent_version", "warnings", "file_scope", "invoice_months", "applied_migrations", "content_fingerprint", "files"],
+ "additionalProperties": false,
+ "properties": {
+  "format": {"const": "homensai-rent-archive/1"},
+  "created_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+  "on": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+  "rent_version": {"type": "string", "minLength": 1},
+  "warnings": {"type": "array", "items": {"type": "string"}},
+  "file_scope": {"type": "string"},
+  "invoice_months": {"type": "array", "items": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}$"}},
+  "applied_migrations": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9_]+/[0-9]{4}_.+$"}},
+  "content_fingerprint": {
+   "type": "object",
+   "required": ["counts", "payments_minor", "audit_last"],
+   "additionalProperties": false,
+   "properties": {
+    "counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "payments_minor": {"type": "object", "additionalProperties": {"type": "integer"}},
+    "audit_last": {"type": ["string", "null"]}
+   }
+  },
+  "files": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": ["path", "kind", "size", "sha256"],
+    "additionalProperties": false,
+    "properties": {
+     "path": {"type": "string", "minLength": 1, "not": {"const": "manifest.json"}},
+     "kind": {"enum": ["excel", "database", "invoice", "data_file"]},
+     "size": {"type": "integer", "minimum": 0},
+     "sha256": {"$ref": "#/$defs/hex64"}
+    }
+   }
+  }
+ },
+ "$defs": {
+  "hex64": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+ }
+}

@@ -1,0 +1,73 @@
+{
+ "$comment": "HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI",
+ "note": "Тест-вектор. Все пароли, ключи и данные вымышленные; в работе не использовать.",
+ "spec": "spec/README.md",
+ "key": {
+  "key_hex": "e8aa54c97681efc5e2ef34fe3cd8353e",
+  "text": "RK1-X2N59-JBPG7-QWBRQ-F6KZ3-SP1N7-VQEC0",
+  "checksum_hex": "eee6",
+  "recipient_public": "8E5bLT6pbqqLzjyIqRqTT6FKd_Fqm02azzfK68cGbzM=",
+  "recovery_id": "RK-ADEB-36B7",
+  "errors": [
+   {
+    "text": "RK1-X2N59-JBPG7-QWBRQ-F6KZ3-SP1N7-VQE00",
+    "code": "recovery_checksum"
+   },
+   {
+    "text": "RK1-ABCDE",
+    "code": "recovery_format"
+   }
+  ]
+ },
+ "shamir": {
+  "key_hex": "e8aa54c97681efc5e2ef34fe3cd8353e",
+  "threshold": 2,
+  "parts": 3,
+  "set_label_hex": "eada",
+  "shares": [
+   {
+    "index": 1,
+    "share_hex": "6da8ea6a0b0c82a3750a700410e2a2df",
+    "text": "RS1-1-07NDM-VD8X9-N0P34-2MDTG-MW042-3HA5Q-TSG80"
+   },
+   {
+    "index": 2,
+    "share_hex": "e2af298f8d9b3508cd25bd0a64ad1a7b",
+    "text": "RS1-2-0BNDN-RNF56-7RV6S-N136J-BF8AC-JPHMY-VCC00"
+   },
+   {
+    "index": 3,
+    "share_hex": "67ad972cf016586e5ac0f9f048978d9a",
+    "text": "RS1-3-0FNDM-SXDJW-PF05J-RDSDC-1YFG9-2BRV6-J7040"
+   }
+  ],
+  "combine_pairs": [
+   [
+    1,
+    2
+   ],
+   [
+    1,
+    3
+   ],
+   [
+    2,
+    3
+   ]
+  ],
+  "errors": [
+   {
+    "texts": [
+     "RS1-1-07NDM-VD8X9-N0P34-2MDTG-MW042-3HA5Q-TSG80"
+    ],
+    "code": "shares_needed"
+   }
+  ]
+ },
+ "prf": {
+  "prf_output_hex": "8fd0cb2c8647a5184d80f848b66a0c2d7766ae5ab1e4c19ad011c15ba289f77b",
+  "info": "homensai-security/webauthn-prf/recovery/1",
+  "recovery_key_hex": "787b819311a2ae804de3273ffaaf2ad7",
+  "recovery_key_text": "RK1-F1XR3-4RHMA-Q80KF-34WZZ-NBSAT-Y6GT0"
+ }
+}

@@ -1,0 +1,56 @@
+{
+ "$comment": "HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI",
+ "note": "Тест-вектор. Все пароли, ключи и данные вымышленные; в работе не использовать.",
+ "spec": "spec/README.md",
+ "raw": [
+  {
+   "name": "copies-password",
+   "password": "Пример-пароль-копий-2026",
+   "salt_hex": "b0561bfb3f2e2c3e4090c67d3798fba1",
+   "m": 65536,
+   "t": 3,
+   "p": 4,
+   "length": 32,
+   "key_hex": "3332ad0ec7951bda10ab5cba933ae09dda938be704cd74d86361345e9f9b4108"
+  },
+  {
+   "name": "copies-pin",
+   "password": "4826",
+   "salt_hex": "36a0dd2aadbe82c6b8a554b22368643c",
+   "m": 65536,
+   "t": 8,
+   "p": 4,
+   "length": 32,
+   "key_hex": "e60f490e4fc6b5bfad73fbef3fe34ac36aad86d02400d35ced0823c4387c7d94"
+  }
+ ],
+ "phc": [
+  {
+   "name": "phc-ascii",
+   "password": "Fictional-login-pass-01",
+   "phc": "$argon2id$v=19$m=65536,t=3,p=4$LBSxNaYUxTY3LAGqBggsCg$NV2mHzvHGttfxFEWqhyG4Y4pmnHAuAVvF2Tj0XqCXcg",
+   "verify": true
+  },
+  {
+   "name": "phc-nfkc",
+   "password": "Ｐａｓｓ-Пример-①",
+   "phc": "$argon2id$v=19$m=65536,t=3,p=4$iaEKrEgH81f13hESgQh17w$afQN2GTfUayvwCXhxrO/T29fz2p3ZDMUfvGYWCy2APA",
+   "verify": true,
+   "equivalent_password": "Pass-Пример-1"
+  }
+ ],
+ "limits": {
+  "m": [
+   19456,
+   1048576
+  ],
+  "t": [
+   2,
+   32
+  ],
+  "p": [
+   1,
+   16
+  ]
+ }
+}
