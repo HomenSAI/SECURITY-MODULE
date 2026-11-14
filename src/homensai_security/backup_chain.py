@@ -144,3 +144,14 @@ def verify_sequence(texts: Sequence[str], known: Mapping[str, bytes]) -> list[Ch
             problems.append(ChainProblem("chain_link", seq))
         prev, expected = sha256_text(text), seq + 1
     return problems
+
+
+def last_trusted(texts: Sequence[str], known: Mapping[str, bytes]) -> int:
+    """Откат по журналу (решение 333 п. 5, как Borg append-only): номер последнего манифеста, до которого цепочка цела
+    (0 — доверенных нет). Восстанавливать — копию этого номера; всё после — под подозрением, пока не проверено вручную."""
+    good = 0
+    for count in range(1, len(texts) + 1):
+        if verify_sequence(texts[:count], known):
+            break
+        good = count
+    return good

@@ -53,3 +53,17 @@ def test_new_identity_round_trip_and_seal() -> None:
     with pytest.raises(keys.BackupKeyError) as info:
         keys.unwrap_identity(wrapped, "другой", public=public)
     assert info.value.code == "bad_password"
+
+
+def test_change_password_keeps_key_rekey_makes_new_one() -> None:
+    public, fingerprint, wrapped = keys.new_identity("Пароль-один-2026!")
+    new_wrapped = keys.change_password(wrapped, "Пароль-один-2026!", "Пароль-два-2026!", public=public)
+    raw = keys.unwrap_identity(new_wrapped, "Пароль-два-2026!", public=public)
+    assert keys.public_of_raw(raw) == public
+    with pytest.raises(keys.BackupKeyError):
+        keys.unwrap_identity(new_wrapped, "Пароль-один-2026!", public=public)
+    with pytest.raises(keys.BackupKeyError):
+        keys.change_password(wrapped, "не тот", "x", public=public)
+    new_public, new_fp, _w = keys.rekey("Пароль-три-2026!")
+    assert new_public != public
+    assert new_fp != fingerprint

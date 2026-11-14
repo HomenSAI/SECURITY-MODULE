@@ -258,3 +258,24 @@ def open_password(envelope: dict[str, Any], password: bytes | None) -> bytes:
         return ChaCha20Poly1305(_seal_key(shared, epk, pk)).decrypt(_unb64(envelope.get("nonce"), 12), _unb64(envelope.get("ct")), SEAL_INFO)
     except InvalidTag as exc:
         raise ArchiveError("corrupt", "конверт копии повреждён") from exc
+
+
+# --- Пароль ≠ ключ (решение 333 п. 6, как restic: смена пароля не меняет мастер-ключ) ------------------------------------
+
+
+def change_password(wrapped: object, old_password: str, new_password: str, *, public: str, pin: bool = False) -> dict[str, Any]:
+    """Сменить пароль копий: тот же ключ хозяйства, новая обёртка. Старые и новые копии открываются новым паролем
+    (в новых копиях — новая обёртка), отпечаток HR1 не меняется. Если есть подозрение, что ключ или старая копия вместе
+    с паролем утекли, этого мало — нужен `rekey`."""
+    raw = unwrap_identity(wrapped, old_password, public=public)
+    new_public, _fp, new_wrapped = wrap_identity(raw, new_password, pin=pin)
+    if new_public != public:  # pragma: no cover — та же пара по построению
+        raise ArchiveError("corrupt", "ключ изменился при смене пароля")
+    return new_wrapped
+
+
+def rekey(new_password: str, *, pin: bool = False) -> tuple[str, str, dict[str, Any]]:
+    """Сменить ключ хозяйства: новая пара X25519 и новый отпечаток. Новые копии — на новом ключе; старые копии остаются на
+    прежнем и открываются прежним паролем (их можно перешифровать или удалить по ротации). Ключи восстановления и лист —
+    выпустить заново: прежние открывают только прежний ключ."""
+    return new_identity(new_password, pin=pin)
