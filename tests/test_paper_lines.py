@@ -70,3 +70,19 @@ def test_every_single_substitution_and_wrong_place_is_caught() -> None:
                         assert not codes.check_paper_line(number, flat[:i] + other + flat[i + 1:] + sep + check)
             for other_number in range(1, len(lines) + 1):
                 assert codes.check_paper_line(other_number, line) == (other_number == number)
+
+
+def test_recovery_input_accepts_paper_lines_of_key_and_shares() -> None:
+    from homensai_security import public_api
+
+    key = public_api.new_recovery_key()
+    lines = codes.paper_lines(key.text)
+    assert public_api.recovery_from_input("\n".join(lines)) == key.secret
+    first, second, _third = public_api.split_key(key.secret)
+    paper = "\n".join([*codes.paper_lines(first), *codes.paper_lines(second)])
+    assert public_api.recovery_from_input(paper) == key.secret
+    body, sep, check = lines[0].rpartition(" · ")
+    broken = body[:-1] + ("0" if body[-1] != "0" else "1") + sep + check
+    with pytest.raises(SecurityError):
+        public_api.recovery_from_input("\n".join([broken, *lines[1:]]))
+    assert public_api.recovery_from_input("мой·пароль") is None  # пароль со знаком «·» — не лист

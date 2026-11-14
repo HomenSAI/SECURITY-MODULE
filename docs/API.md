@@ -39,6 +39,7 @@ sec.configure(sec.RENT_PRODUCT)  # вернуть значения Rent
 | `parse_recovery_key(text) -> bytes` | Запись → 16 байт. `recovery_format`, `recovery_checksum`. |
 | `recovery_text_of(secret) -> str` | 16 байт → запись `RK1-…` (например, ключ из PRF). |
 | `looks_like_recovery(text) -> bool` | Похоже ли на `RK1-…`. |
+| `paper_input(text) -> str` | Строки с бумажного листа (« · X» в конце каждой) → обычная запись `RK1-…` / `RS1-…`; каждая строка проверяется своим знаком (`recovery_checksum`), новая часть — со строки с префиксом; не лист — текст как есть. `recovery_from_input` вызывает её сам |
 | `recovery_from_input(text) -> bytes \| None` | Ввод «пароль или ключ»: `RK1-…` или две-три части `RS1-…` → ключ; обычный пароль → `None`; опечатка → `SecurityError`. |
 | `split_key(secret) -> (str, str, str)` | Три части `RS1-…`. |
 | `combine_shares(texts) -> bytes` | Любые две части (список или строка) → ключ. `shares_needed`, `shares_mismatch`. |

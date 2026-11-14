@@ -136,6 +136,7 @@ __all__ = [
     "needs_risk_ack",
     "new_recovery_key",
     "open_with",
+    "paper_input",
     "parse_recovery_key",
     "pin_failure",
     "recommendation",
@@ -220,8 +221,26 @@ def looks_like_recovery(text: str) -> bool:
     return codes.looks_like_recovery(text)
 
 
+def paper_input(text: str) -> str:
+    """Ввод с бумажного листа (строки с контрольным знаком « · X», решение 333 п. 1) → обычная запись RK1-… / RS1-….
+
+    Каждая строка проверяется своим знаком (ошибка — `recovery_checksum`); новая часть начинается со строки с префиксом
+    RK1/RS1. Текст без знаков « · » возвращается как есть."""
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if not lines or "·" not in lines[0] or not codes.looks_like_recovery(lines[0].rpartition("·")[0]):
+        return text  # не лист: обычная запись или пароль (в пароле может встретиться «·»)
+    groups: list[list[str]] = []
+    for line in lines:
+        if not groups or codes.looks_like_recovery(line.rpartition("·")[0]):
+            groups.append([])
+        groups[-1].append(line)
+    return "\n".join(codes.from_paper(group) for group in groups)
+
+
 def recovery_from_input(text: str) -> bytes | None:
-    """Ключ восстановления из ввода: запись RK1-… или две (три) части RS1-…; обычный пароль — None. Опечатка — SecurityError."""
+    """Ключ восстановления из ввода: запись RK1-… или две (три) части RS1-… — и то же строками с бумажного листа
+    (с контрольным знаком каждой строки); обычный пароль — None. Опечатка — SecurityError."""
+    text = paper_input(text)
     if not codes.looks_like_recovery(text) and not codes.SHARE_RE.search(codes.normalize(text)):
         return None
     if codes.SHARE_RE.search(codes.normalize(text)):
