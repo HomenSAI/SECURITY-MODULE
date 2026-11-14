@@ -10,6 +10,7 @@
 - `backup_chain`: откат к последней доверенной копии (`last_trusted`).
 - `restore_policy`: отбор устаревших сообщений после восстановления (`stale_after_restore`), проверка неизменяемости облачных копий (`object_lock_problem`).
 - `errors`: коды `trustee_invalid`, `trustee_no_request`.
+- Пакет помечен `py.typed` (PEP 561): mypy продукта проверяет вызовы модуля по его аннотациям.
 
 ## 0.2.0 — 14.11.2026
 - `fields`: шифрование полей `v1gcm`, слепой индекс `bi2`, KCV, чтение `v0stub` (вектора field-aead.json).
