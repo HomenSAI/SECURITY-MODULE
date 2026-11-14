@@ -337,3 +337,32 @@ except sec.SecurityError as exc:
     entry = sec.ERRORS[exc.code]
     print(exc.code, entry["level"], entry["ru"], "—", entry["what_to_do_ru"])
 ```
+
+## 17. Шифрование полей базы (`sec.fields`, MOD.extract-fields)
+
+Формат — `spec/field-encryption.md`, вектора — `spec/vectors/field-aead.json` (тест `tests/test_fields.py` сверяет байт в байт).
+Модуль не читает окружение: ключ и контекст поля передаёт продукт.
+
+| Имя | Что делает |
+|---|---|
+| `FieldKeys(base: bytes, domain="homensai-rent")` | базовый ключ (UTF-8 байты строки ключа как есть) и домен продукта; `derive(info)` — HKDF-SHA256 с солью «домен/v1» |
+| `fields.keys_from_text(key_text, domain=...) -> FieldKeys` | ключ из настройки; слабый (пустой, < 43 знаков, < 10 разных знаков, шаблон) — `ValueError` |
+| `fields.weak_key_problem(key_text) -> str \| None` | причина, почему ключ не подходит для рабочей базы |
+| `FieldContext(account_id, table, column, row_id)` | место значения; входит в AAD — перенос шифротекста в другое место ломает тег |
+| `fields.seal(keys, plaintext, field=None) -> bytes` | конверт `v1gcm|` ‖ nonce 12 ‖ AES-256-GCM |
+| `fields.unseal(keys, blob, field=None) -> str` | открывает `v1gcm` и прежний `v0stub` Rent (только чтение); ошибка — `FieldCryptoError` |
+| `fields.blind_index(keys, normalized, field=None) -> str` | `bi2:` HMAC для поиска совпадений в колонке (нормализует значение продукт) |
+| `fields.key_check_value(keys)`, `key_fingerprint(keys)`, `same_key(keys, stored_kcv)` | KCV ключа (хранить в базе), отпечаток 8 знаков, проверка «тот же ключ» постоянного времени |
+
+```python
+from homensai_security import public_api as sec
+
+keys = sec.fields.keys_from_text("Xk3_9fQ2mZ7pL0vN4rT8yB1cD6hJ5sW-aE2gU9iO3kM", domain="homensai-jobpilot")
+where = sec.FieldContext("acc-1", "candidates", "phone_enc", "42")
+blob = sec.fields.seal(keys, "+380 00 000-00-01", where)
+assert sec.fields.unseal(keys, blob, where) == "+380 00 000-00-01"
+print(sec.fields.key_fingerprint(keys))  # хранить key_check_value в базе; другой ключ при старте — отказ запуска
+```
+
+Другой домен — несовместимые шифротексты (так и задумано: Rent и JobPilot Pro не открывают данные друг друга).
+Перешифровка базы (`v0stub → v1gcm`, переход на vault ядра) — работа адаптера продукта с базой; в Rent — `app/platform/aead_migrate.py`, `reseal.py`.
