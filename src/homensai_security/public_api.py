@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from homensai_security import codes, fields, help, kdf, levels, recommendations, recovery, shamir, sheet, training, web, wizard
+from homensai_security import access, codes, fields, help, kdf, levels, licensing, recommendations, recovery, shamir, sheet, training, web, wizard
 from homensai_security.actions import (
     ACTION_TITLES,
     ACTIONS,
@@ -87,6 +87,7 @@ __all__ = [
     "SecurityError",
     "SheetData",
     "TableDigest",
+    "access",
     "action_title",
     "argon2_params",
     "audit_digest",
@@ -106,6 +107,7 @@ __all__ = [
     "legacy_share_set",
     "level",
     "level_measures",
+    "licensing",
     "looks_like_recovery",
     "lowering",
     "needs_rehash",
