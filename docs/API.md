@@ -457,3 +457,15 @@ print(sec.fields.key_fingerprint(keys))  # хранить key_check_value в б�
 
 Аварийный лист (333 п. 2, как Emergency Kit 1Password): `SheetData(..., app_address="", trustee="")` — адрес программы и
 доверенное лицо; строка «Пароль входа в программу: ____ (только от руки)» печатается всегда, сам пароль входа — никогда.
+
+## 25. Доверенное лицо (`sec.trustee`, решение 333 п. 3, как Bitwarden Emergency Access)
+
+| Имя | Что делает |
+|---|---|
+| `trustee.Trustee(trustee_id, level="view"/"takeover", wait_days=7)` | назначение; срок ожидания — 1, 2, 7, 14 или 30 дней; иначе `trustee_invalid` |
+| `trustee.request(t, now)` | доверенное лицо запрашивает доступ (повтор не сбрасывает ожидание) |
+| `trustee.deny(t, now)`, `trustee.revoke(t, now)` | владелец отказывает в течение срока / закрывает выданный доступ |
+| `trustee.opens_at(t)`, `trustee.granted(t, now)`, `trustee.state(t, now)` | когда откроется; открыт ли; `none`/`waiting`/`granted`/`denied`/`revoked` |
+
+Продукт хранит назначение и запрос, при запросе шлёт владельцу уведомления во все каналы и пускает доверенное лицо только
+на выбранный уровень после `granted`.
