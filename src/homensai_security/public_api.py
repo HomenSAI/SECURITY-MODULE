@@ -91,6 +91,7 @@ __all__ = [
     "action_title",
     "argon2_params",
     "audit_digest",
+    "backup_keys",
     "check_pin",
     "combine_shares",
     "configure",
@@ -258,3 +259,7 @@ def recovery_text_of(secret: bytes) -> str:
 
 
 __all__ += ["recovery_text_of"]
+
+
+# Ключ копий импортирует public_api сам (ключ восстановления), поэтому подключается последним (без цикла при импорте).
+from homensai_security import backup_keys  # noqa: E402
