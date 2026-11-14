@@ -1,0 +1,58 @@
+# HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "homensai-security"
+version = "0.1.0"
+description = "Модуль безопасности HomenS.AI: копии и ключи восстановления, Argon2id, PIN, WebAuthn/passkey, TOTP, коды входа, целостность, уровни 0–5, мастер, помощь RU/UK"
+readme = "README.md"
+requires-python = ">=3.14"
+license = { text = "Proprietary — © 2026 Serhii Khomenko" }
+authors = [{ name = "Serhii Khomenko" }]
+# Версии — как в Rent (requirements/*.lock): модуль проверен на них.
+dependencies = [
+    "cryptography==50.0.2",
+    "pycryptodomex==3.24.1",
+]
+
+[project.optional-dependencies]
+pdf = ["reportlab==5.0.1"]  # аварийный лист PDF (sheet.emergency_sheet_pdf); без него — только строки листа
+test = ["pytest>=9.1", "reportlab==5.0.1"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "tests"]
+addopts = "-q --strict-markers -p no:cacheprovider"
+
+[tool.ruff]
+line-length = 160
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "S", "RUF", "C4", "PIE", "PT", "RET"]
+ignore = [
+  "RUF001", "RUF002", "RUF003",  # кириллица в строках и комментариях — норма для русского и украинского текста
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+known-first-party = ["homensai_security", "virtual_authenticator"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+files = ["src/homensai_security"]
+mypy_path = "src"
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["reportlab.*", "Cryptodome.*"]
+ignore_missing_imports = true
