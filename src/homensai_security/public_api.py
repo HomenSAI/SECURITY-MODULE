@@ -10,7 +10,24 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from homensai_security import access, codes, fields, help, important, kdf, levels, licensing, recommendations, recovery, shamir, sheet, training, web, wizard
+from homensai_security import (
+    access,
+    backup_chain,
+    codes,
+    fields,
+    help,
+    important,
+    kdf,
+    levels,
+    licensing,
+    recommendations,
+    recovery,
+    shamir,
+    sheet,
+    training,
+    web,
+    wizard,
+)
 from homensai_security.actions import (
     ACTION_TITLES,
     ACTIONS,
@@ -91,6 +108,7 @@ __all__ = [
     "action_title",
     "argon2_params",
     "audit_digest",
+    "backup_chain",
     "backup_keys",
     "check_pin",
     "combine_shares",
