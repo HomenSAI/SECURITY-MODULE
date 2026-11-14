@@ -402,3 +402,14 @@ print(sec.fields.key_fingerprint(keys))  # хранить key_check_value в б�
 | `licensing.growth_guard(count, allowed_without_license, licensed) -> check` | снимок числа объектов внутри транзакции; `check()` до COMMIT: рост выше бесплатного порога без лицензии — `QuotaExceededError` |
 
 Подпись лицензии и учёт ключей — ядро HomenS.AI Core (`backend.modules.licensing`); чтение, экспорт и копии лицензией не ограничиваются.
+
+## 21. Строки «Безопасность» для ленты напоминаний (`sec.important`, MOD.important-api)
+
+Продукт передаёт состояния и свои адреса экранов (`Hrefs`, по умолчанию — Rent), модуль собирает одинаковые `ImportantItem(key, title, note, href, due, alarm, blink)`.
+
+| Имя | Что делает |
+|---|---|
+| `important.guide_items(state, today, reco_state=, training_facts=, hrefs=, lang=)` | «Настройте безопасность», отложенные шаги мастера, «Как защитить компьютер», тренировка (просрочка мигает, не тревога) |
+| `important.recommendation_items(reco_state, today, hrefs=, lang=)` | рекомендации NordVPN/ESET/NordPass (партнёрская пометка), не мигают |
+| `important.pin_paused_item(paused_until, now, today)` | пауза PIN после 5 ошибок — «проверьте журнал», не тревога |
+| `important.alarm_item(key, title, note, href, today)` | настоящая тревога продукта (пароль копий 270, целостность 273, цепочка 276): красная, мигает |

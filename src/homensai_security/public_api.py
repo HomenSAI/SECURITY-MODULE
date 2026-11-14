@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from homensai_security import access, codes, fields, help, kdf, levels, licensing, recommendations, recovery, shamir, sheet, training, web, wizard
+from homensai_security import access, codes, fields, help, important, kdf, levels, licensing, recommendations, recovery, shamir, sheet, training, web, wizard
 from homensai_security.actions import (
     ACTION_TITLES,
     ACTIONS,
@@ -102,6 +102,7 @@ __all__ = [
     "fields",
     "hash_pin",
     "hash_secret",
+    "important",
     "journal_canonical",
     "journal_link",
     "legacy_share_set",
