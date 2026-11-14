@@ -25,6 +25,7 @@ from homensai_security import (
     shamir,
     sheet,
     training,
+    trustee,
     web,
     wizard,
 )
@@ -149,6 +150,7 @@ __all__ = [
     "shamir_combine_raw",
     "sheet_lines",
     "split_key",
+    "trustee",
     "validate_policy",
     "verify_chain",
     "verify_pin",
