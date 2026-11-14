@@ -1,12 +1,15 @@
-<!-- HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko -->
-# Документация — оглавление (заполняется пакетом MOD)
+<!-- HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI -->
+# Документация — оглавление
 
-| Документ | Пункт реестра Rent | Состояние |
-|---|---|---|
-| [CRYPTO.md](CRYPTO.md) — методы криптографии и почему они выбраны | MOD.crypto-rationale | готов (13.11.2026), сводка «уточнить» — в конце |
-| INTEGRATION.md — подключение к продукту | MOD.scaffold / MOD.rent-dependency | впереди |
-| RULES.md — правила, рекомендации VPN/антивирус | MOD.errors-help | впереди |
-| help/ — помощь RU/UK, «Если случилось» | MOD.errors-help | впереди |
-| [../spec/](../spec/README.md) — форматы копии, конверта ключа, цепочки, полей; JSON-схемы; коды ошибок; тест-векторы | MOD.spec | готов (13.11.2026) |
+| Документ | Что |
+|---|---|
+| [API.md](API.md) | Весь `homensai_security.public_api`: сигнатуры, входы/выходы, исключения, рабочие примеры |
+| [ERRORS.md](ERRORS.md) | Таблица кодов ошибок (уровень, текст, «что делать»), как ловить `SecurityError`, связь с `spec/error-codes.json` и базой ошибок HomenSAI |
+| [INTEGRATION.md](INTEGRATION.md) | Подключение к продукту: установка, `configure`, что хранить, «Важное», веб-слой, последовательности, адаптеры Rent и FastAPI |
+| [RULES.md](RULES.md) | Обязательные правила: что нельзя, понижение защиты, PIN и ключи, рекомендации NordVPN/NordPass/ESET, журнал |
+| [CRYPTO.md](CRYPTO.md) | Методы криптографии и почему они выбраны; когда пересматривать |
+| [help/SECURITY_HELP.md](help/SECURITY_HELP.md) | Тексты помощи RU/UK и «Если случилось». **Собирается** `scripts/build_security_help.py` из `help_ru.py`/`help_uk.py` — руками не править |
+| [../spec/](../spec/README.md) | Форматы копии, конверта ключа, цепочки, полей; JSON-схемы; коды ошибок копий; тест-вектора |
 
-Тест-вектора: `python scripts/gen_vectors.py` (кодом Rent, детерминированно), проверка — `python -m pytest tests/test_vectors.py`.
+Тест-вектора: `python scripts/gen_vectors.py`, проверка — `python -m pytest tests/test_vectors.py`.
+Примеры кода в документах проверены запуском с `PYTHONPATH=src`.
