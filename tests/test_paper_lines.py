@@ -44,3 +44,14 @@ def test_garbage_refused() -> None:
     with pytest.raises(SecurityError):
         codes.paper_lines("hello")
     assert not codes.check_paper_line(1, "RK1-ABCDE no check")
+
+
+def test_emergency_sheet_has_login_blank_address_and_trustee() -> None:
+    from homensai_security import public_api as sec
+
+    plain = sec.sheet_lines(sec.SheetData("HR1-A", "HS1-B"))
+    assert any("Пароль входа в программу: ____" in line for line in plain)
+    assert any(line.startswith("Адрес программы: ____") for line in plain)
+    filled = sec.sheet_lines(sec.SheetData("HR1-A", "HS1-B", app_address="http://127.0.0.1:8765", trustee="Иванов Иван, +380 00 000-00-01"), "uk")
+    assert "Адреса програми: http://127.0.0.1:8765" in filled
+    assert any("Іванов" in line or "Иванов" in line for line in filled)

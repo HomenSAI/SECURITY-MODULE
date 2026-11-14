@@ -36,6 +36,11 @@ TEXTS: dict[str, dict[str, str]] = {
         "step3": "3. Введите пароль копий. Забыли пароль — введите ключ восстановления (RK1-…) или две части ключа (RS1-…).",
         "step4": "4. Сверьте отпечатки HR1 и HS1 на экране «Защита копий» с этим листом.",
         "step5": "5. После восстановления задайте новый пароль копий и распечатайте новый лист.",
+        "login_blank": "Пароль входа в программу: ________________________________ (только от руки)",
+        "address": "Адрес программы: {address}",
+        "address_blank": "Адрес программы: ________________________________",
+        "trustee": "Доверенное лицо (поможет восстановить): {trustee}",
+        "trustee_blank": "Доверенное лицо (поможет восстановить): ________________________________",
         "paper": "Для ввода с бумаги — построчно, последний знак строки проверочный:",
         "codes": "Коды восстановления входа (каждый — один раз, вместо ключа или Google Authenticator):",
     },
@@ -55,6 +60,11 @@ TEXTS: dict[str, dict[str, str]] = {
         "step3": "3. Введіть пароль копій. Забули пароль — введіть ключ відновлення (RK1-…) або дві частини ключа (RS1-…).",
         "step4": "4. Звірте відбитки HR1 і HS1 на екрані «Захист копій» з цим листом.",
         "step5": "5. Після відновлення задайте новий пароль копій і роздрукуйте новий лист.",
+        "login_blank": "Пароль входу в програму: ________________________________ (лише від руки)",
+        "address": "Адреса програми: {address}",
+        "address_blank": "Адреса програми: ________________________________",
+        "trustee": "Довірена особа (допоможе відновити): {trustee}",
+        "trustee_blank": "Довірена особа (допоможе відновити): ________________________________",
         "paper": "Для введення з паперу — порядково, останній знак рядка перевірний:",
         "codes": "Коди відновлення входу (кожен — один раз, замість ключа або Google Authenticator):",
     },
@@ -70,6 +80,9 @@ class SheetData:
     password: str | None = None  # только по явному выбору пользователя
     recovery_name: str = ""
     login_codes: tuple[str, ...] = ()  # 28.10-284: новый набор кодов входа, выпущенный вместе с листом (старые хэши не печатаются)
+    # 333 п. 2 (как Emergency Kit 1Password): адрес программы, место для пароля входа от руки, доверенное лицо
+    app_address: str = ""  # например http://127.0.0.1:8765 или адрес установки
+    trustee: str = ""  # кто поможет восстановить (имя и как связаться) — по желанию владельца
 
 
 def sheet_lines(data: SheetData, lang: str = "ru") -> list[str]:
@@ -87,6 +100,9 @@ def sheet_lines(data: SheetData, lang: str = "ru") -> list[str]:
     else:
         lines.append(t["recovery_none"])
     lines.append(t["password"].format(password=data.password) if data.password else t["password_blank"])
+    lines.append(t["login_blank"])  # пароль входа в программу на лист не печатается никогда — только от руки
+    lines.append(t["address"].format(address=data.app_address) if data.app_address else t["address_blank"])
+    lines.append(t["trustee"].format(trustee=data.trustee) if data.trustee else t["trustee_blank"])
     lines += ["", t["steps"], t["step1"], t["step2"], t["step3"], t["step4"], t["step5"]]
     if data.login_codes:
         lines += ["", t["codes"]]
