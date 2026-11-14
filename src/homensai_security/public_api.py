@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from homensai_security import codes, help, kdf, levels, recommendations, recovery, shamir, sheet, training, wizard
+from homensai_security import codes, fields, help, kdf, levels, recommendations, recovery, shamir, sheet, training, wizard
 from homensai_security.actions import (
     ACTION_TITLES,
     ACTIONS,
@@ -33,6 +33,7 @@ from homensai_security.actions import (
     verify_pin,
 )
 from homensai_security.errors import ERRORS, SecurityError
+from homensai_security.fields import FieldContext, FieldCryptoError, FieldKeys
 from homensai_security.integrity import ZERO as JOURNAL_ZERO
 from homensai_security.integrity import Entry as JournalEntry
 from homensai_security.integrity import Finding as IntegrityFinding
@@ -71,6 +72,9 @@ __all__ = [
     "RENT_PRODUCT",
     "TTL_CHOICES",
     "TTL_TITLES",
+    "FieldContext",
+    "FieldCryptoError",
+    "FieldKeys",
     "IntegrityFinding",
     "JournalEntry",
     "JournalProblem",
@@ -94,6 +98,7 @@ __all__ = [
     "diff_rows",
     "emergency_sheet_pdf",
     "expired",
+    "fields",
     "hash_pin",
     "hash_secret",
     "journal_canonical",

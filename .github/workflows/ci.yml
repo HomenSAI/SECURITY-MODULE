@@ -28,7 +28,7 @@ jobs:
       - name: Зависимости
         run: python -m pip install -e ".[test]" ruff==0.17.3 mypy==2.4.0 jsonschema
       - name: ruff
-        run: python -m ruff check src tests/test_product.py tests/test_security_actions.py tests/test_security_auth.py tests/test_security_guide.py tests/test_security_integrity.py tests/test_security_module.py tests/virtual_authenticator.py
+        run: python -m ruff check src tests/test_product.py tests/test_fields.py tests/test_security_actions.py tests/test_security_auth.py tests/test_security_guide.py tests/test_security_integrity.py tests/test_security_module.py tests/virtual_authenticator.py
       - name: mypy strict
         run: python -m mypy --config-file pyproject.toml
       - name: pytest
