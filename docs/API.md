@@ -366,3 +366,18 @@ print(sec.fields.key_fingerprint(keys))  # хранить key_check_value в б�
 
 Другой домен — несовместимые шифротексты (так и задумано: Rent и JobPilot Pro не открывают данные друг друга).
 Перешифровка базы (`v0stub → v1gcm`, переход на vault ядра) — работа адаптера продукта с базой; в Rent — `app/platform/aead_migrate.py`, `reseal.py`.
+
+## 18. Защита веба (`sec.web`, MOD.extract-web)
+
+Без фреймворка: модуль решает и возвращает `WebRefusal(status, code)` (код — из справочника ошибок продукта), адаптер отвечает.
+
+| Имя | Что делает |
+|---|---|
+| `web.security_headers(untrusted_file=False)` | заголовки каждого ответа: nosniff, DENY, Referrer/COOP/CORP/Permissions-Policy + CSP (`sandbox` для файла от постороннего) |
+| `web.check_host(host, allowed_hosts)` | чужой Host — `400 web_bad_host` |
+| `web.check_same_site(headers, allowed_hosts)` | до чтения тела: Origin / Sec-Fetch-Site / Referer — чужой сайт `403 web_foreign_origin` (`headers` в нижнем регистре) |
+| `web.new_csrf_token()`, `web.check_csrf(cookie, form)` | CSRF «двойная отправка» (cookie HttpOnly; SameSite=Strict + скрытое поле `csrf_token`) — `403 web_csrf` |
+| `web.body_limit(ct)`, `web.check_body_length(ct, n)` | 1 МБ для форм, 30 МБ для multipart — `413 upload_too_big` |
+| `web.clean_field(s)`, `web.clean_header(s)` | убрать управляющие символы из полей; закодировать их в заголовках ответа |
+| `web.new_form_key()`, `form_begin/form_done/form_release(store, raw, …)`, `request_key(raw)` | одноразовый ключ формы: повтор не выполняется второй раз; `store` — `FormKeyStore` продукта (хранит только SHA-256) |
+| `web.after_failed_login(failures, now)`, `web.login_locked(until, now)`, `web.lock_seconds(n)` | пауза после каждых 5 неудач: 15 мин, затем ×2, не больше 6 ч |

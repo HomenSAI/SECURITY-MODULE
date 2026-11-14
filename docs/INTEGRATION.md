@@ -181,3 +181,34 @@ print(client.post("/security/passkey/options", headers={"x-pin": "4821"}).json()
 ```
 
 В продукте PIN передаёт форма, а не заголовок; разрешение выдаётся cookie (см. раздел 5, п. 6). Для JobPilot Pro (Python 3.14, FastAPI, JS) адаптер — отдельный пакет продукта (`backend/security_adapter/`), а JS-кнопка — копия логики `design/rent-webauthn.js` Rent.
+
+## Приложение: защита веба в FastAPI/Starlette (`sec.web`)
+
+```python
+from fastapi import FastAPI, Request
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import PlainTextResponse
+from homensai_security import public_api as sec
+
+HOSTS = ("127.0.0.1:8000", "localhost:8000")
+
+class SecurityMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        headers = {k.lower(): v for k, v in request.headers.items()}
+        refusal = sec.web.check_host(headers.get("host", ""), HOSTS)
+        if refusal is None and request.method not in ("GET", "HEAD", "OPTIONS"):
+            refusal = sec.web.check_same_site(headers, HOSTS) or sec.web.check_body_length(
+                headers.get("content-type", ""), int(headers.get("content-length") or 0))
+        if refusal is not None:
+            return PlainTextResponse(refusal.code, status_code=refusal.status)  # текст — из справочника ошибок по коду
+        response = await call_next(request)
+        for name, value in sec.web.security_headers():
+            response.headers[name] = value
+        return response
+
+app = FastAPI()
+app.add_middleware(SecurityMiddleware)
+```
+
+CSRF и ключ формы проверяются в обработчике формы после разбора тела: `sec.web.check_csrf(request.cookies.get("csrf"), form["csrf_token"])`,
+затем `sec.web.form_begin(store, form["_form_key"], now)` → действие → `form_done` (или `form_release` при ошибке ввода).
