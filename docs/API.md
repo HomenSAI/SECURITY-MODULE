@@ -429,3 +429,17 @@ print(sec.fields.key_fingerprint(keys))  # хранить key_check_value в б�
 | `backup_keys.seal_identity`, `open_identity`, `private_by_recovery`, `fingerprint_of`, `public_of_raw` | ключ восстановления как второй ключ к копиям (279/284), отпечаток HR1 |
 
 Цепочка копий, упаковка ZIP и проверка носителей пока остаются в адаптере Rent (`app/archive/chain.py`, `pack.py`) — формат описан в `spec/chain.md`, `spec/archive-format.md`.
+
+## 23. Цепочка копий (`sec.backup_chain`, MOD.extract-backups)
+
+Формат — `spec/chain.md`, вектора `chain.json` (переподпись байт в байт). Файлы, ключ подписи (DPAPI / права 0600) и носители — у адаптера.
+
+| Имя | Что делает |
+|---|---|
+| `backup_chain.sign_manifest(private, body) -> Signed(seq, body, text, manifest_sha256)` | подпись тела Ed25519; `text` писать как есть в `chain/NNNNNN.json`; `manifest_sha256` — `prev` следующего |
+| `backup_chain.parse_manifest(text)`, `signature_ok(text, known)` | разбор (мусор и > 64 КиБ — None) и проверка подписи ключом по `signer` (`known`: отпечаток → открытый ключ) |
+| `backup_chain.verify_sequence(texts, known) -> [ChainProblem(code, seq)]` | номера подряд, подпись, `prev`; коды `chain_gap`, `chain_signature`, `chain_link` |
+| `backup_chain.fingerprint_of(public)`, `public_raw(private)` | отпечаток `HS1-…` |
+| `backup_chain.manifest_name(seq)`, `manifest_seq(name)`, `os_file(name)` | строгие имена файлов (синонимы — посторонние), служебные файлы ОС — тихая строка (294) |
+
+Сверка носителей (пропал/изменён манифест или копия, чужой файл) и упаковка ZIP остаются в адаптере Rent (`app/archive/chain.py`, `pack.py`).
