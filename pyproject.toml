@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "homensai-security"
-version = "0.1.0"
+version = "0.2.0"
 description = "Модуль безопасности HomenS.AI: копии и ключи восстановления, Argon2id, PIN, WebAuthn/passkey, TOTP, коды входа, целостность, уровни 0–5, мастер, помощь RU/UK"
 readme = "README.md"
 requires-python = ">=3.14"
