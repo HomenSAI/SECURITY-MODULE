@@ -15,7 +15,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import date
 
-from homensai_security import help, recommendations, training, wizard
+from homensai_security import help, recommendations, wizard
+from homensai_security import training as _training
 
 OVERDUE_PREFIX = "security-train-overdue:"
 
@@ -47,7 +48,7 @@ class Hrefs:
     })
     training_default: str = "/security/training"
 
-    def train(self, item: training.Item) -> str:
+    def train(self, item: _training.Item) -> str:
         if item.kind in ("review", "drill"):
             return self.training.get(item.kind, self.training_default)
         return self.training.get(item.method or "", self.training_default)
@@ -58,7 +59,7 @@ def _t(lang: str, ru: str, uk: str) -> str:
 
 
 def guide_items(state: wizard.WizardState, today: date, *, reco_state: Mapping[str, object] | None = None,
-                training_facts: training.Facts | None = None, hrefs: Hrefs | None = None, lang: str = "ru") -> list[ImportantItem]:
+                training_facts: _training.Facts | None = None, hrefs: Hrefs | None = None, lang: str = "ru") -> list[ImportantItem]:
     """Мастер (напоминание и отложенные шаги), «Как защитить компьютер», тренировка. Не мигают, кроме просрочки тренировки."""
     hrefs = hrefs or Hrefs()
     items: list[ImportantItem] = []
@@ -77,7 +78,7 @@ def guide_items(state: wizard.WizardState, today: date, *, reco_state: Mapping[s
         items.append(ImportantItem("security-protect-pc", help.ui("protect_pc", lang),
                                    _t(lang, f"Осталось пунктов: {left}", f"Залишилося пунктів: {left}"), hrefs.protect_pc, today))
     if training_facts is not None:
-        for item in training.due_items(training_facts, today):
+        for item in _training.due_items(training_facts, today):
             label = f"{item.kind}:{item.method}" if item.method else item.kind
             key = (OVERDUE_PREFIX if item.overdue else "security-train:") + item.key.removeprefix("train:")
             note = (help.training_text("overdue", lang) + " · " if item.overdue else "") + f"{item.due:%d.%m.%Y}"
