@@ -381,3 +381,24 @@ print(sec.fields.key_fingerprint(keys))  # хранить key_check_value в б�
 | `web.clean_field(s)`, `web.clean_header(s)` | убрать управляющие символы из полей; закодировать их в заголовках ответа |
 | `web.new_form_key()`, `form_begin/form_done/form_release(store, raw, …)`, `request_key(raw)` | одноразовый ключ формы: повтор не выполняется второй раз; `store` — `FormKeyStore` продукта (хранит только SHA-256) |
 | `web.after_failed_login(failures, now)`, `web.login_locked(until, now)`, `web.lock_seconds(n)` | пауза после каждых 5 неудач: 15 мин, затем ×2, не больше 6 ч |
+
+## 19. Роли и права (`sec.access`, MOD.extract-access)
+
+Продукт описывает каталог; модуль решает. Неизвестное право **никогда** не разрешено.
+
+| Имя | Что делает |
+|---|---|
+| `access.Catalog(permissions, legacy={}, roles=())` | каталог прав продукта, старые имена → новые, предустановленные роли; право вне каталога в ролях/алиасах — `UnknownPermissionError` при создании |
+| `Catalog.canonical(name)`, `Catalog.role(id)` | полное имя права (неизвестное — `UnknownPermissionError`); роль по id |
+| `access.Role(id, name, permissions)` | предустановленная роль (Rent: Совладелец / Помощник / Риэлтор / Бухгалтер) |
+| `access.allowed(catalog, granted, name) -> bool`, `access.require(...)` | есть ли право; `require` — `PermissionError` (адаптер → 403) |
+| `access.preset_update_allowed(saved_name, saved_permissions, preset, previous_presets)` | обновлять предустановку можно, только если роль не меняли вручную |
+
+## 20. Лицензирование (`sec.licensing`, MOD.extract-licensing)
+
+| Имя | Что делает |
+|---|---|
+| `licensing.read_keys_file(path) -> tuple[VerificationKey, ...]` | строгий разбор `{"keys": [{"key_id", "public_key_hex"}]}`: только открытые ключи Ed25519, лишнее поле — `LicenseConfigError` |
+| `licensing.growth_guard(count, allowed_without_license, licensed) -> check` | снимок числа объектов внутри транзакции; `check()` до COMMIT: рост выше бесплатного порога без лицензии — `QuotaExceededError` |
+
+Подпись лицензии и учёт ключей — ядро HomenS.AI Core (`backend.modules.licensing`); чтение, экспорт и копии лицензией не ограничиваются.
