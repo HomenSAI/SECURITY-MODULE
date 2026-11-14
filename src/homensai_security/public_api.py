@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from homensai_security import codes, fields, help, kdf, levels, recommendations, recovery, shamir, sheet, training, wizard
+from homensai_security import codes, fields, help, kdf, levels, recommendations, recovery, shamir, sheet, training, web, wizard
 from homensai_security.actions import (
     ACTION_TITLES,
     ACTIONS,
@@ -132,6 +132,7 @@ __all__ = [
     "verify_pin",
     "verify_secret",
     "visible_recommendations",
+    "web",
 ]
 
 ARGON2_DEFAULT = dict(kdf.DEFAULT)
