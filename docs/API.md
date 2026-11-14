@@ -413,3 +413,19 @@ print(sec.fields.key_fingerprint(keys))  # хранить key_check_value в б�
 | `important.recommendation_items(reco_state, today, hrefs=, lang=)` | рекомендации NordVPN/ESET/NordPass (партнёрская пометка), не мигают |
 | `important.pin_paused_item(paused_until, now, today)` | пауза PIN после 5 ошибок — «проверьте журнал», не тревога |
 | `important.alarm_item(key, title, note, href, today)` | настоящая тревога продукта (пароль копий 270, целостность 273, цепочка 276): красная, мигает |
+
+## 22. Ключ хозяйства для копий (`sec.backup_keys`, MOD.extract-backups — часть)
+
+Перенос Rent `app/archive/keys.py`; формат — `spec/key-envelope.md`, вектора `identity.json`, `envelope.json` (тест сверяет байт в байт).
+Пароль не хранится: пара X25519, закрытый ключ завёрнут Argon2id + ChaCha20-Poly1305; секрет каждой копии запечатан на открытый ключ.
+
+| Имя | Что делает |
+|---|---|
+| `backup_keys.new_identity(password, pin=False) -> (public, fingerprint, wrapped)` | новая пара ключей хозяйства; `wrapped` хранить в настройках, пароль — нигде |
+| `backup_keys.unwrap_identity(wrapped, password, public=)` | закрытый ключ по паролю (это и есть проверка пароля 270); неверный — `BackupKeyError("bad_password")` |
+| `backup_keys.seal(mode, public, wrapped, recovery=()) -> (secret, comment)` | секрет новой копии (пароль внешнего ZIP) и комментарий ZIP с конвертом `HRKEY1 {json}`; `mode`: `generated`/`custom`/`pin` |
+| `backup_keys.envelope_from_comment(comment)` | конверт из комментария ZIP (мусор/старый формат — None) |
+| `backup_keys.open_password(envelope, password_or_recovery)` | секрет копии по паролю, ключу восстановления RK1 или двум частям RS1; ошибки `bad_password`, `recovery_wrong`, `no_key`, `corrupt` |
+| `backup_keys.seal_identity`, `open_identity`, `private_by_recovery`, `fingerprint_of`, `public_of_raw` | ключ восстановления как второй ключ к копиям (279/284), отпечаток HR1 |
+
+Цепочка копий, упаковка ZIP и проверка носителей пока остаются в адаптере Rent (`app/archive/chain.py`, `pack.py`) — формат описан в `spec/chain.md`, `spec/archive-format.md`.
