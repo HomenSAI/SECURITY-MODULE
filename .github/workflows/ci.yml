@@ -1,0 +1,37 @@
+# HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI
+# Проверка модуля: ruff, mypy strict, pytest (Linux и Windows). Репозиторий публичный — GitHub-hosted runner бесплатен.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.14"
+      - name: Зависимости
+        run: python -m pip install -e ".[test]" ruff==0.17.3 mypy==2.4.0 jsonschema
+      - name: ruff
+        run: python -m ruff check src tests/test_product.py tests/test_security_actions.py tests/test_security_auth.py tests/test_security_guide.py tests/test_security_integrity.py tests/test_security_module.py tests/virtual_authenticator.py
+      - name: mypy strict
+        run: python -m mypy --config-file pyproject.toml
+      - name: pytest
+        run: python -m pytest
+      - name: Помощь собрана из данных
+        run: python scripts/build_security_help.py --check
