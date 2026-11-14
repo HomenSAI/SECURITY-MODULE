@@ -145,11 +145,23 @@ def looks_like_recovery(text: str) -> bool:
 # Сам ключ и его общая контрольная сумма не меняются: строки без контрольных знаков по-прежнему принимает `parse_key`.
 PAPER_GROUPS = 3
 PAPER_SEPARATOR = " · "
-_PAPER_SUM = b"homensai-security/paper-line/1"
 
 
 def _line_check(number: int, body: str) -> str:
-    return ALPHABET[hashlib.sha256(_PAPER_SUM + bytes([number]) + body.encode("ascii")).digest()[0] & 31]
+    """Контрольный знак строки — Luhn mod 32 по алфавиту Crockford (номер строки — первым знаком). Ловит любую одну
+    ошибочную букву (детерминированно, не «в 31 случае из 32», как знак из хэша) и почти все перестановки соседних знаков;
+    строка на чужом месте не проходит (другой номер — другая первая буква)."""
+    if not 1 <= number < len(ALPHABET):
+        raise SecurityError("recovery_format")
+    total, factor = 0, 1
+    for char in reversed(ALPHABET[number] + body):
+        code = ALPHABET.find(char)
+        if code < 0:
+            raise SecurityError("recovery_format")
+        factor = 2 if factor == 1 else 1
+        addend = factor * code
+        total += addend // len(ALPHABET) + addend % len(ALPHABET)
+    return ALPHABET[(len(ALPHABET) - total % len(ALPHABET)) % len(ALPHABET)]
 
 
 def paper_lines(text: str) -> list[str]:

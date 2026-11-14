@@ -448,7 +448,7 @@ print(sec.fields.key_fingerprint(keys))  # хранить key_check_value в б�
 
 | Имя | Что делает |
 |---|---|
-| `codes.paper_lines(text) -> list[str]` | ключ RK1 / часть RS1 строками по 3 группы, у каждой — контрольный знак после « · » (как `borg key export --paper`) |
+| `codes.paper_lines(text) -> list[str]` | ключ RK1 / часть RS1 строками по 3 группы, у каждой — контрольный знак после « · » — Luhn mod 32 по алфавиту Crockford с номером строки: любая одна ошибочная буква и строка на чужом месте ловятся всегда (идея — `borg key export --paper`) |
 | `codes.check_paper_line(number, line) -> bool` | верна ли строка с бумаги (номер с 1; строка на чужом месте не проходит) |
 | `codes.from_paper(lines) -> str` | собрать обычную запись для `parse_key`/`parse_share`; ошибка строки — `SecurityError("recovery_checksum")` |
 

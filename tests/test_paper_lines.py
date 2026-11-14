@@ -55,3 +55,18 @@ def test_emergency_sheet_has_login_blank_address_and_trustee() -> None:
     filled = sec.sheet_lines(sec.SheetData("HR1-A", "HS1-B", app_address="http://127.0.0.1:8765", trustee="Иванов Иван, +380 00 000-00-01"), "uk")
     assert "Адреса програми: http://127.0.0.1:8765" in filled
     assert any("Іванов" in line or "Иванов" in line for line in filled)
+
+
+def test_every_single_substitution_and_wrong_place_is_caught() -> None:
+    """Luhn mod 32: любая одна ошибочная буква в строке и строка на чужом месте ловятся всегда, без случайности."""
+    for _ in range(5):
+        lines = codes.paper_lines(codes.format_key(codes.new_key()))
+        for number, line in enumerate(lines, 1):
+            body, sep, check = line.rpartition(" · ")
+            flat = codes.normalize(body)
+            for i, char in enumerate(flat):
+                for other in codes.ALPHABET:
+                    if other != char:
+                        assert not codes.check_paper_line(number, flat[:i] + other + flat[i + 1:] + sep + check)
+            for other_number in range(1, len(lines) + 1):
+                assert codes.check_paper_line(other_number, line) == (other_number == number)
