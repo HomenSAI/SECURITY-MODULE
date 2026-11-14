@@ -25,7 +25,7 @@ import secrets
 
 from homensai_security.errors import SecurityError
 
-LADDER = (3, 7, 14, 30)  # дни, как у Signal (287 п. 2)
+LADDER = (3, 7, 14, 30)  # дни — свои числа (287 п. 2, уточнение 333); от Signal взят только принцип «верно — реже, ошибка — чаще»
 CHECKUP_DAYS = 28  # GitHub: через 28 дней после включения 2FA (287 п. 1)
 REVIEW_DAYS = 182  # обзор восстановления раз в полгода (287 п. 3)
 DRILL_DAYS = 91  # учебное восстановление раз в квартал (287 п. 4)
