@@ -36,6 +36,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "step3": "3. Введите пароль копий. Забыли пароль — введите ключ восстановления (RK1-…) или две части ключа (RS1-…).",
         "step4": "4. Сверьте отпечатки HR1 и HS1 на экране «Защита копий» с этим листом.",
         "step5": "5. После восстановления задайте новый пароль копий и распечатайте новый лист.",
+        "paper": "Для ввода с бумаги — построчно, последний знак строки проверочный:",
         "codes": "Коды восстановления входа (каждый — один раз, вместо ключа или Google Authenticator):",
     },
     "uk": {
@@ -54,6 +55,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "step3": "3. Введіть пароль копій. Забули пароль — введіть ключ відновлення (RK1-…) або дві частини ключа (RS1-…).",
         "step4": "4. Звірте відбитки HR1 і HS1 на екрані «Захист копій» з цим листом.",
         "step5": "5. Після відновлення задайте новий пароль копій і роздрукуйте новий лист.",
+        "paper": "Для введення з паперу — порядково, останній знак рядка перевірний:",
         "codes": "Коди відновлення входу (кожен — один раз, замість ключа або Google Authenticator):",
     },
 }
@@ -78,6 +80,10 @@ def sheet_lines(data: SheetData, lang: str = "ru") -> list[str]:
     lines.append("")
     if data.recovery_text:
         lines.append(t["recovery"].format(name=data.recovery_name or "—", key=data.recovery_text))
+        from homensai_security.codes import looks_like_recovery, paper_lines
+
+        if looks_like_recovery(data.recovery_text):  # 333 п. 1: строки с контрольным знаком — опечатка находится в своей строке
+            lines += [t["paper"]] + [f"  {i}) {line}" for i, line in enumerate(paper_lines(data.recovery_text), 1)]
     else:
         lines.append(t["recovery_none"])
     lines.append(t["password"].format(password=data.password) if data.password else t["password_blank"])

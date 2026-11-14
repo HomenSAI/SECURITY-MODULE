@@ -137,3 +137,57 @@ def find_shares(text: str) -> list[tuple[int, bytes, bytes]]:
 def looks_like_recovery(text: str) -> bool:
     flat = normalize(text)
     return flat.startswith((KEY_PREFIX, SHARE_PREFIX))
+
+
+# --- Бумажная запись с контролем каждой строки (решение 333 п. 1, как `borg key export --paper`) -----------------------
+# Ключ или часть печатается строками по PAPER_GROUPS групп; в конце строки — один контрольный знак Crockford Base32 от
+# SHA-256(номер строки ‖ текст строки). При вводе с бумаги опечатка находится в конкретной строке, а не во всём ключе.
+# Сам ключ и его общая контрольная сумма не меняются: строки без контрольных знаков по-прежнему принимает `parse_key`.
+PAPER_GROUPS = 3
+PAPER_SEPARATOR = " · "
+_PAPER_SUM = b"homensai-security/paper-line/1"
+
+
+def _line_check(number: int, body: str) -> str:
+    return ALPHABET[hashlib.sha256(_PAPER_SUM + bytes([number]) + body.encode("ascii")).digest()[0] & 31]
+
+
+def paper_lines(text: str) -> list[str]:
+    """Ключ RK1 / часть RS1 для печати: строки по 3 группы, у каждой — контрольный знак после « · ».
+
+    Первая строка начинается с префикса (`RK1-`, `RS1-N-`), он входит в проверку строки."""
+    flat = normalize(text)
+    if flat.startswith(SHARE_PREFIX) and len(flat) > len(SHARE_PREFIX):
+        head, body = f"{SHARE_PREFIX}-{flat[len(SHARE_PREFIX)]}-", flat[len(SHARE_PREFIX) + 1:]
+    elif flat.startswith(KEY_PREFIX):
+        head, body = f"{KEY_PREFIX}-", flat[len(KEY_PREFIX):]
+    else:
+        raise SecurityError("recovery_format")
+    step = PAPER_GROUPS * GROUP
+    lines = []
+    for number, start in enumerate(range(0, len(body), step), 1):
+        chunk = _groups(body[start:start + step])
+        shown = (head if number == 1 else "") + chunk
+        lines.append(f"{shown}{PAPER_SEPARATOR}{_line_check(number, normalize(shown))}")
+    return lines
+
+
+def check_paper_line(number: int, line: str) -> bool:
+    """Верна ли строка `number` (с 1), введённая с бумаги вместе с контрольным знаком."""
+    text, sep, check = line.rpartition("·")
+    if not sep:
+        return False
+    flat_check = normalize(check)
+    return len(flat_check) == 1 and _line_check(number, normalize(text)) == flat_check
+
+
+def from_paper(lines: list[str]) -> str:
+    """Запись ключа из строк с бумаги: каждая строка проверяется своим знаком; ошибка — `recovery_checksum` с номером.
+
+    Возвращает обычную запись (`RK1-…` / `RS1-N-…`) для `parse_key` / `parse_share`."""
+    parts = []
+    for number, line in enumerate(lines, 1):
+        if not check_paper_line(number, line):
+            raise SecurityError("recovery_checksum")
+        parts.append(line.rpartition("·")[0])
+    return normalize("".join(parts))
