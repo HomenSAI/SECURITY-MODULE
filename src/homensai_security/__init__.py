@@ -14,4 +14,4 @@
 Снаружи — только `homensai_security.public_api` (полный список — `docs/API.md`).
 """
 
-__version__ = "0.3.2"
+__version__ = "0.4.0"
