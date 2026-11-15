@@ -37,4 +37,4 @@ def test_invalid_settings_and_codes_in_catalog() -> None:
             trustee.Trustee(**bad)  # type: ignore[arg-type]
     with pytest.raises(SecurityError):
         trustee.deny(trustee.Trustee("x"), now=0)
-    assert {"trustee_invalid", "trustee_no_request"} <= set(ERRORS)
+    assert {"trustee_invalid", "trustee_no_request", "trustee_code_wrong"} <= set(ERRORS)
