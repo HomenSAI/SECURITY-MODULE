@@ -86,3 +86,65 @@ def test_recovery_input_accepts_paper_lines_of_key_and_shares() -> None:
     with pytest.raises(SecurityError):
         public_api.recovery_from_input("\n".join([broken, *lines[1:]]))
     assert public_api.recovery_from_input("мой·пароль") is None  # пароль со знаком «·» — не лист
+
+
+# --- 0.3.1: границы строк задаёт структура, а не префикс; разделитель можно набрать с клавиатуры -----------------------
+
+# Ключ, у которого вторая строка листа начинается с «RK1» (≈1 из 16 384): подобран сидом sha256(b"key10254")[:16].
+_KEY_RK1_SECOND = bytes.fromhex("59d4da285d9cfa389498986dd5f1703f")
+# Часть, у которой третья строка начинается с «RK1» (≈1 из 8192): sha256(b"sh10754")[:16], метка 1234, номер 2.
+_SHARE_RK1_THIRD = (2, bytes.fromhex("1234"), bytes.fromhex("8c22d884dcf5f8981e845d010c384f17"))
+
+
+def test_key_whose_second_line_starts_with_prefix_is_accepted() -> None:
+    from homensai_security import public_api
+
+    lines = codes.paper_lines(codes.format_key(_KEY_RK1_SECOND))
+    assert codes.normalize(lines[1]).startswith("RK1")  # ловушка действительно есть
+    assert public_api.recovery_from_input("\n".join(lines)) == _KEY_RK1_SECOND
+    assert public_api.paper_input("\n".join(lines)) == codes.normalize(codes.format_key(_KEY_RK1_SECOND))
+
+
+def test_share_whose_later_line_starts_with_prefix_is_accepted() -> None:
+    from homensai_security import public_api
+
+    text = codes.format_share(*_SHARE_RK1_THIRD)
+    lines = codes.paper_lines(text)
+    assert len(lines) == 3
+    assert codes.normalize(lines[2]).startswith("RK1")
+    assert public_api.paper_input("\n".join(lines)) == codes.normalize(text)
+    # две части подряд: вторая часть по-прежнему начинается с новой группы
+    other = codes.format_share(1, b"\x12\x34", bytes(16))
+    paper = "\n".join([*lines, *codes.paper_lines(other)])
+    assert public_api.paper_input(paper) == "\n".join([codes.normalize(text), codes.normalize(other)])
+
+
+def test_paper_input_accepts_keyboard_separators_instead_of_middle_dot() -> None:
+    from homensai_security import public_api
+
+    key = public_api.new_recovery_key()
+    lines = codes.paper_lines(key.text)
+    for sep in (" ", ".", "-", " - ", ".  "):
+        typed = "\n".join(line.replace(" · ", sep) for line in lines)
+        assert "·" not in typed
+        assert public_api.recovery_from_input(typed) == key.secret
+    # ошибка в строке находится и без «·»
+    body, _sep, check = lines[0].rpartition(" · ")
+    broken = body[:-1] + ("0" if body[-1] != "0" else "1") + " " + check
+    with pytest.raises(SecurityError) as err:
+        public_api.recovery_from_input("\n".join([broken, *lines[1:]]))
+    assert err.value.code == "recovery_checksum"
+
+
+def test_plain_entries_and_passwords_are_not_taken_for_paper() -> None:
+    from homensai_security import public_api
+
+    key = public_api.new_recovery_key()
+    assert public_api.paper_input(key.text) == key.text
+    assert public_api.recovery_from_input(key.text) == key.secret
+    assert public_api.recovery_from_input(key.text.replace("-", " ")) == key.secret
+    first, second, _third = public_api.split_key(key.secret)
+    assert public_api.paper_input(first) == first
+    assert public_api.recovery_from_input(f"{first}\n{second}") == key.secret
+    for password in ("мой·пароль", "correct horse battery staple", "RK1 password 4"):
+        assert public_api.paper_input(password) == password

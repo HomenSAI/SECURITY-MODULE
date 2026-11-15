@@ -39,7 +39,7 @@ sec.configure(sec.RENT_PRODUCT)  # вернуть значения Rent
 | `parse_recovery_key(text) -> bytes` | Запись → 16 байт. `recovery_format`, `recovery_checksum`. |
 | `recovery_text_of(secret) -> str` | 16 байт → запись `RK1-…` (например, ключ из PRF). |
 | `looks_like_recovery(text) -> bool` | Похоже ли на `RK1-…`. |
-| `paper_input(text) -> str` | Строки с бумажного листа (« · X» в конце каждой) → обычная запись `RK1-…` / `RS1-…`; каждая строка проверяется своим знаком (`recovery_checksum`), новая часть — со строки с префиксом; не лист — текст как есть. `recovery_from_input` вызывает её сам |
+| `paper_input(text) -> str` | Строки с бумажного листа (« · X» в конце каждой; вместо «·» годятся пробел, точка, дефис) → обычная запись `RK1-…` / `RS1-…`; каждая строка проверяется своим знаком (`recovery_checksum`), границы задаёт число строк (ключ — 2, часть — 3), а не префикс; не лист — текст как есть. `recovery_from_input` вызывает её сам |
 | `recovery_from_input(text) -> bytes \| None` | Ввод «пароль или ключ»: `RK1-…` или две-три части `RS1-…` → ключ; обычный пароль → `None`; опечатка → `SecurityError`. |
 | `split_key(secret) -> (str, str, str)` | Три части `RS1-…`. |
 | `combine_shares(texts) -> bytes` | Любые две части (список или строка) → ключ. `shares_needed`, `shares_mismatch`. |
@@ -452,6 +452,7 @@ print(sec.fields.key_fingerprint(keys))  # хранить key_check_value в б�
 | `codes.paper_lines(text) -> list[str]` | ключ RK1 / часть RS1 строками по 3 группы, у каждой — контрольный знак после « · » — Luhn mod 32 по алфавиту Crockford с номером строки: любая одна ошибочная буква и строка на чужом месте ловятся всегда (идея — `borg key export --paper`) |
 | `codes.check_paper_line(number, line) -> bool` | верна ли строка с бумаги (номер с 1; строка на чужом месте не проходит) |
 | `codes.from_paper(lines) -> str` | собрать обычную запись для `parse_key`/`parse_share`; ошибка строки — `SecurityError("recovery_checksum")` |
+| `codes.split_paper_line(line)` / `codes.paper_groups(lines)` | строка → (текст, знак) с разделителем «·» / пробел / точка / дефис; строки листа → группы по числу строк (ключ — 2, часть — 3) |
 
 Аварийный лист (`sheet_lines`) печатает ключ и ниже — те же строки с проверочными знаками. Сам ключ и общая контрольная
 сумма не меняются: старые листы и ввод без знаков принимаются как раньше.

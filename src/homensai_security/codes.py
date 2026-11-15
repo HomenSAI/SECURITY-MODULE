@@ -184,11 +184,32 @@ def paper_lines(text: str) -> list[str]:
     return lines
 
 
+# Символ « · » не набрать с обычной клавиатуры: вместо него принимаются пробел, точка, дефис и другие разделители —
+# если последний знак строки стоит отдельно (один знак после разделителя; в обычной записи последняя группа — 5 знаков).
+_PAPER_TAIL = re.compile(r"^(.*[0-9A-Za-z])[\s.\-_,;:]+([0-9A-Za-z])\s*$")
+
+# Сколько строк занимают ключ и часть на бумаге: структура, а не префикс строки (вторая строка может начинаться с «RK1»).
+PAPER_KEY_LINES = -(-KEY_GROUPS * GROUP // (PAPER_GROUPS * GROUP))
+PAPER_SHARE_LINES = -(-SHARE_GROUPS * GROUP // (PAPER_GROUPS * GROUP))
+# Первая строка листа без знаков разделителя: «RK1» + 15 знаков у ключа, «RS1» + номер + 15 знаков у части.
+PAPER_FIRST_LINE_LENGTHS = (len(KEY_PREFIX) + PAPER_GROUPS * GROUP, len(SHARE_PREFIX) + 1 + PAPER_GROUPS * GROUP)
+
+
+def split_paper_line(line: str) -> tuple[str, str] | None:
+    """Строка с бумаги → (текст, знак) или None, если знака нет. Разделитель — «·» либо пробел / точка / дефис."""
+    if "·" in line:
+        text, _sep, check = line.rpartition("·")
+        return text, check
+    found = _PAPER_TAIL.match(line)
+    return (found.group(1), found.group(2)) if found else None
+
+
 def check_paper_line(number: int, line: str) -> bool:
     """Верна ли строка `number` (с 1), введённая с бумаги вместе с контрольным знаком."""
-    text, sep, check = line.rpartition("·")
-    if not sep:
+    split = split_paper_line(line)
+    if split is None:
         return False
+    text, check = split
     flat_check = normalize(check)
     return len(flat_check) == 1 and _line_check(number, normalize(text)) == flat_check
 
@@ -199,7 +220,30 @@ def from_paper(lines: list[str]) -> str:
     Возвращает обычную запись (`RK1-…` / `RS1-N-…`) для `parse_key` / `parse_share`."""
     parts = []
     for number, line in enumerate(lines, 1):
-        if not check_paper_line(number, line):
+        split = split_paper_line(line)
+        if split is None or not check_paper_line(number, line):
             raise SecurityError("recovery_checksum")
-        parts.append(line.rpartition("·")[0])
+        parts.append(split[0])
     return normalize("".join(parts))
+
+
+def paper_groups(lines: list[str]) -> list[list[str]] | None:
+    """Строки листа → группы «ключ / часть». Границы задаёт структура (у ключа 2 строки, у части 3), а не префикс строки:
+    у 1 ключа из 16 384 вторая строка случайно начинается с «RK1». None — это не лист (нет знака у строки или нет префикса)."""
+    splits = [split_paper_line(line) for line in lines]
+    if not lines or any(split is None for split in splits):
+        return None
+    heads = [normalize(split[0]) for split in splits if split is not None]
+    groups: list[list[str]] = []
+    index = 0
+    while index < len(lines):
+        if not heads[index].startswith((KEY_PREFIX, SHARE_PREFIX)):
+            if not groups:
+                return None
+            groups[-1].append(lines[index])  # лишняя строка: её не примет проверка знака (чужое место)
+            index += 1
+            continue
+        size = PAPER_KEY_LINES if heads[index].startswith(KEY_PREFIX) else PAPER_SHARE_LINES
+        groups.append(lines[index:index + size])
+        index += size
+    return groups

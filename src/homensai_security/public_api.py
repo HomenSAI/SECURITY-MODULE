@@ -224,16 +224,20 @@ def looks_like_recovery(text: str) -> bool:
 def paper_input(text: str) -> str:
     """Ввод с бумажного листа (строки с контрольным знаком « · X», решение 333 п. 1) → обычная запись RK1-… / RS1-….
 
-    Каждая строка проверяется своим знаком (ошибка — `recovery_checksum`); новая часть начинается со строки с префиксом
-    RK1/RS1. Текст без знаков « · » возвращается как есть."""
+    Вместо «·» годится пробел, точка или дефис. Каждая строка проверяется своим знаком (ошибка — `recovery_checksum`);
+    границы ключа и частей задаёт число строк (ключ — 2, часть — 3), а не префикс строки. Текст без знаков возвращается
+    как есть (обычная запись или пароль; в пароле может встретиться «·»)."""
     lines = [line.strip() for line in text.splitlines() if line.strip()]
-    if not lines or "·" not in lines[0] or not codes.looks_like_recovery(lines[0].rpartition("·")[0]):
-        return text  # не лист: обычная запись или пароль (в пароле может встретиться «·»)
-    groups: list[list[str]] = []
-    for line in lines:
-        if not groups or codes.looks_like_recovery(line.rpartition("·")[0]):
-            groups.append([])
-        groups[-1].append(line)
+    if not lines:
+        return text
+    first = codes.split_paper_line(lines[0])
+    if first is None or not codes.looks_like_recovery(first[0]):
+        return text  # не лист: обычная запись или пароль
+    if "·" not in lines[0] and len(codes.normalize(first[0])) not in codes.PAPER_FIRST_LINE_LENGTHS:
+        return text  # без «·» первая строка должна быть целой строкой листа, иначе это пароль, начинающийся с «RK1»
+    groups = codes.paper_groups(lines)
+    if groups is None:
+        return text
     return "\n".join(codes.from_paper(group) for group in groups)
 
 
