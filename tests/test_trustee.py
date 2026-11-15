@@ -38,3 +38,16 @@ def test_invalid_settings_and_codes_in_catalog() -> None:
     with pytest.raises(SecurityError):
         trustee.deny(trustee.Trustee("x"), now=0)
     assert {"trustee_invalid", "trustee_no_request", "trustee_code_wrong"} <= set(ERRORS)
+
+
+def test_revoked_designation_is_not_revived_by_a_new_request() -> None:
+    """0.3.3 (ревью Rent POSTBETA Д9): запрос после отзыва ничего не меняет — назначение остаётся отозванным."""
+    t = trustee.revoke(trustee.request(trustee.Trustee("t1", wait_days=1), 100), 200)
+    again = trustee.request(t, 300)
+    assert again == t
+    assert trustee.state(again, 300 + 2 * trustee.DAY) == "revoked"
+    assert not trustee.granted(again, 300 + 2 * trustee.DAY)
+    denied = trustee.deny(trustee.request(trustee.Trustee("t2", wait_days=1), 100), 150)
+    retried = trustee.request(denied, 400)
+    assert trustee.state(retried, 400) == "waiting"
+    assert trustee.opens_at(retried) == 400 + trustee.DAY

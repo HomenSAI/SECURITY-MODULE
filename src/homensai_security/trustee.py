@@ -37,10 +37,14 @@ class Trustee:
 
 
 def request(t: Trustee, now: int) -> Trustee:
-    """Доверенное лицо запрашивает доступ (повторный запрос при уже идущем — без изменений, ожидание не сбрасывается)."""
-    if t.requested_at is not None and t.denied_at is None and t.revoked_at is None:
+    """Доверенное лицо запрашивает доступ (повторный запрос при уже идущем — без изменений, ожидание не сбрасывается).
+    Отозванное назначение запросом не оживает (0.3.3, ревью Rent POSTBETA Д9): остаётся отозванным; после отказа
+    новый запрос возможен — ожидание начинается заново."""
+    if t.revoked_at is not None:
         return t
-    return replace(t, requested_at=now, denied_at=None, revoked_at=None)
+    if t.requested_at is not None and t.denied_at is None:
+        return t
+    return replace(t, requested_at=now, denied_at=None)
 
 
 def deny(t: Trustee, now: int) -> Trustee:
