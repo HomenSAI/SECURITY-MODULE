@@ -96,5 +96,5 @@ def test_error_codes_and_texts_exist() -> None:
         body = auth_texts.text("login_code_body", lang, app="HomenS.AI Rent", code="12345678", minutes=10, link="http://localhost/x")
         assert "12345678" in body
         assert "http://localhost/x" in body
-        assert "12345678" in auth_texts.text("login_code_subject", lang, app="A", code="12345678")
+        assert "12345678" not in auth_texts.text("login_code_subject", lang, app="A", code="12345678")  # П4: кода в теме нет
         assert auth_texts.text("tg_login_code", lang, when="10:00")
