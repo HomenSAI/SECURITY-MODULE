@@ -9,7 +9,7 @@
 pip install "homensai-security[pdf] @ git+https://github.com/HomenSAI/SECURITY-MODULE@<тег>"
 ```
 
-Python 3.14. Зависимости: `cryptography==50.0.2`, `pycryptodomex==3.24.1`; extra `[pdf]` (reportlab) нужен только аварийному листу в PDF. Тег — фиксированный релиз (`v0.3.3`); ветку `main` не подключать. В lock-файле продукта — хэш; обновление модуля — отдельным коммитом с прогоном тестов продукта.
+Python 3.14. Зависимости: `cryptography==50.0.2`, `pycryptodomex==3.24.1`; extra `[pdf]` (reportlab) нужен только аварийному листу в PDF. Тег — фиксированный релиз (`v0.5.0`); ветку `main` не подключать. В lock-файле продукта — хэш; обновление модуля — отдельным коммитом с прогоном тестов продукта.
 
 ## 2. Старт
 
@@ -36,6 +36,7 @@ sec.configure(sec.Product(name="JobPilot Pro", ctl="python -m jobpilot.ctl", bot
 | Секрет TOTP | **только шифротекстом** (шифрование полей продукта), `last_step` | `totp.new_secret`, `totp.verify` |
 | Коды входа | только `code_hash`, id набора, дата использования | `login_codes` |
 | Ссылки сброса | хэш токена, срок, использована ли | `reset.new_token` |
+| Код входа из почты | только HMAC кода (`login_code_message`), SHA-256 токенов ссылки и окна браузера, попытки, сроки; **самого кода нет** — он во фрагменте ссылки «#…» | `reset.new_login_code`, `reset.login_code_link`, `reset.fragment_code` |
 | Состояния мастера, тренировки, рекомендаций | JSON (`WizardState`, `Facts`, словарь рекомендаций) | соответствующие модули |
 | Журнал целостности | записи цепочки `(seq, prev, payload, hash)` + отпечатки таблиц | `journal_link`, `row_hash` |
 | Ключ восстановления, пароль, PIN копий | **не хранить**. Ключ показывают один раз и печатают аварийным листом | `new_recovery_key`, `emergency_sheet_pdf` |

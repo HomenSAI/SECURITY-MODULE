@@ -1,6 +1,33 @@
 <!-- HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI -->
 # Изменения
 
+## 0.5.0 — не выпущено (тег — по команде владельца)
+Новая функция, обратно совместимая (минорная версия): код входа из почты — во фрагменте ссылки (решение Rent 28.10-352 п. 1, П3).
+- `reset.login_code_link(page_url, link_token, code)`: ссылка для письма — токен ссылки в запросе, код во фрагменте «#…»
+  (браузер фрагмент на сервер не отправляет; в журналы веб-сервера код не попадает).
+- `reset.fragment_code(fragment)`: код из фрагмента (8 цифр) или None — те же правила, что у страницы показа кода.
+- Хранение уточнено: продукт хранит только HMAC кода (`login_code_message`) и SHA-256 токенов; сам код — ни открыто,
+  ни шифротекстом. Прежние продукты, хранившие шифротекст «для показа», переходят на фрагмент и стирают его.
+
+## 0.4.1 — не выпущено (тег — по команде владельца)
+- Влита 0.3.3: `trustee.request` не оживляет отозванное назначение (ревью Rent POSTBETA Д9).
+- `auth_texts.login_code_subject`: в теме письма больше нет самого кода — только «Код входа» (ревью Rent POSTBETA П4:
+  тема видна на экране блокировки телефона и в уведомлениях почты). Код — только в тексте письма.
+
+## 0.4.0 — не выпущено (тег — по команде владельца)
+Новая функция, обратно совместимая (минорная версия): вход по одноразовому коду из почты (решение Rent 28.10-344).
+- `reset`: правила рядом со сбросом — `LOGIN_CODE_TTL` (10 минут), `LOGIN_CODE_DIGITS` (8), `LOGIN_CODE_ATTEMPTS` (5),
+  `LOGIN_CODES_PER_HOUR` (3); `email_login_allowed` / `email_login_can_enable` (только при проверенной почте, по умолчанию
+  выключено), `email_login_weakens` (почта без второго фактора), `new_login_code` (код, токен ссылки, токен окна браузера),
+  `normalize_login_code`, `login_code_message` (что подписывает HMAC продукта: код привязан к своему запросу),
+  `login_codes_rate_ok`, `login_code_state` (active/used/superseded/burned/expired), `login_code_verdict`, `mac_equal`.
+  Код заменяет только пароль: при включённом ключе или Google Authenticator после кода нужен и он.
+- `auth_errors`: `email_login_off`, `email_login_mail`, `email_login_code_wrong`, `email_login_expired`, `email_login_browser`,
+  `email_login_rate` (в базе ошибок — SEC-AUTH-043…048, версия базы 1.6.0).
+- `auth_texts`: письмо с кодом (`login_code_subject`, `login_code_body`), уведомление о входе (`tg_login_code`,
+  `imp_login_code`, `imp_login_code_note`).
+- `levels`: поле `LevelFacts.email_login_weak` (по умолчанию False) и мера уровня 3 `email_login_2fa`: вход по коду из почты
+  без второго фактора не даёт уровень 3 и выше — мастер показывает эту меру как причину.
 ## 0.3.3 — не выпущено (тег — по команде владельца)
 - `trustee.request`: отозванное назначение новым запросом не оживает — остаётся отозванным (ревью Rent POSTBETA Д9;
   раньше `request()` снимал `revoked_at`). После отказа новый запрос по-прежнему возможен, ожидание начинается заново.

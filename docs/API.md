@@ -302,6 +302,20 @@ print(reset.proofs_available(f), reset.reset_allowed(f, link_ok=True, proof=None
 print(reset.delayed_state(0, 100), reset.mask_email("ivan@example.com"))
 ```
 
+### 13.1. Вход по одноразовому коду из почты (решение Rent 28.10-344, версия 0.4.0)
+Код заменяет только пароль; при включённом ключе или Google Authenticator после кода нужен и он. По умолчанию выключено,
+включается только при проверенной почте. 8 цифр, 10 минут, один раз, новый код отменяет прежний, 5 неверных вводов — код
+сгорает, не больше 3 писем в час. Ссылка из письма только показывает код; ввод — в том же окне браузера (cookie).
+В базе продукта — HMAC кода с секретом из хранилища ключей (подписывается `login_code_message`) и SHA-256 токенов.
+
+```python
+issued = reset.new_login_code()                      # code, link_token, browser_token — только в памяти
+msg = reset.login_code_message(request_id, issued.code)   # продукт: mac = HMAC(секрет, msg) → в базу
+state = reset.login_code_state(created_at=t0, now=now, attempts=0, used=False, superseded=False)  # active
+verdict = reset.login_code_verdict(state=state, browser_ok=True, mac_ok=reset.mac_equal(stored, computed))  # ok
+reset.login_codes_rate_ok(sent_times, now); reset.email_login_weakens(reset.Factors(), enabled=True)  # True → уровень < 3
+```
+
 ## 14. Аварийный лист (28.10-279 п. 1)
 
 | Функция | Что |
