@@ -108,7 +108,10 @@ def mask_email(address: str) -> str:
 # показывает код крупно и сама вход не выполняет; ввод — в том же окне браузера, где код запрошен (привязка к запросу
 # через cookie). 10 минут, один раз, новый код отменяет прежний, 5 неверных вводов — код сгорает, не больше 3 писем в час.
 # Хранение: продукт кладёт в базу только HMAC кода с секретом из своего хранилища ключей (`login_code_message` — что
-# подписывать) и SHA-256 токенов ссылки и окна браузера (`digest`). Время (секунды Unix) передаёт вызывающий.
+# подписывать) и SHA-256 токенов ссылки и окна браузера (`digest`); сам код — ни открыто, ни шифротекстом (решение Rent
+# 28.10-352 п. 1). Ссылка из письма несёт код во фрагменте «#…» (`login_code_link`): браузер фрагмент на сервер не
+# отправляет, страница показывает код из адреса сама (`fragment_code` — те же правила), сервер по токену ссылки только
+# решает, действует ли она. Время (секунды Unix) передаёт вызывающий.
 
 LOGIN_CODE_TTL = 10 * 60
 LOGIN_CODE_DIGITS = 8
@@ -149,6 +152,18 @@ def normalize_login_code(text: str) -> str | None:
     """8 цифр без пробелов и дефисов; иначе None (не код — неверный ввод)."""
     digits = "".join(ch for ch in text if not ch.isspace() and ch != "-")
     return digits if len(digits) == LOGIN_CODE_DIGITS and digits.isascii() and digits.isdigit() else None
+
+
+def login_code_link(page_url: str, link_token: str, code: str) -> str:
+    """Ссылка для письма: токен ссылки — в запросе (сервер проверяет, действует ли она), код — во фрагменте «#…»
+    (на сервер не уходит и в журналы веб-сервера не попадает)."""
+    return f"{page_url}?t={link_token}#{code}"
+
+
+def fragment_code(fragment: str) -> str | None:
+    """Код из фрагмента ссылки (с «#» или без); не 8 цифр — None (страница кода не показывает)."""
+    value = fragment[1:] if fragment.startswith("#") else fragment
+    return value if len(value) == LOGIN_CODE_DIGITS and value.isascii() and value.isdigit() else None
 
 
 def login_code_message(request_id: str, code: str) -> str:

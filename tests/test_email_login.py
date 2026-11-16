@@ -98,3 +98,17 @@ def test_error_codes_and_texts_exist() -> None:
         assert "http://localhost/x" in body
         assert "12345678" not in auth_texts.text("login_code_subject", lang, app="A", code="12345678")  # П4: кода в теме нет
         assert auth_texts.text("tg_login_code", lang, when="10:00")
+
+
+def test_link_carries_code_in_fragment_only() -> None:
+    """Решение Rent 28.10-352 п. 1 (П3): код — во фрагменте ссылки «#…» (браузер не отправляет его на сервер); в адресе
+    запроса — только токен ссылки. Продукт хранит только HMAC кода, шифротекста кода нет."""
+    issued = reset.new_login_code()
+    link = reset.login_code_link("http://localhost:8080/login/email/show", issued.link_token, issued.code)
+    before, _, fragment = link.partition("#")
+    assert issued.code not in before
+    assert f"t={issued.link_token}" in before
+    assert reset.fragment_code(fragment) == issued.code
+    assert reset.fragment_code("#" + fragment) == issued.code
+    for bad in ("", "#", "code=1234", "#1234567", "#abcdefgh", "#123456789"):
+        assert reset.fragment_code(bad) is None, bad
