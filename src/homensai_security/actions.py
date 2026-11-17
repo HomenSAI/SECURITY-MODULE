@@ -159,7 +159,7 @@ def pin_pause_seconds(count: int) -> int:
     if count <= 0 or count % PIN_LOCK_AFTER:
         return 0
     cycle = count // PIN_LOCK_AFTER - 1
-    return min(PIN_PAUSE_SECONDS * (2 ** min(cycle, 20)), PIN_PAUSE_MAX_SECONDS)
+    return int(min(PIN_PAUSE_SECONDS * (2 ** min(cycle, 20)), PIN_PAUSE_MAX_SECONDS))
 
 
 def pin_failure(failed_count: int, *, now: int) -> tuple[int, int]:

@@ -44,6 +44,11 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101"]
+# модули с таблицами текстов ru/uk: длинные строки — сами тексты
+"src/homensai_security/upgrade_texts.py" = ["E501"]
+"src/homensai_security/levels.py" = ["E501"]
+"src/homensai_security/errors.py" = ["E501"]
+"src/homensai_security/help_*.py" = ["E501"]
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true

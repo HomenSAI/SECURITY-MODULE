@@ -27,8 +27,8 @@ from homensai_security import (
     sheet,
     training,
     trustee,
-    web,
     upgrade,
+    web,
     wizard,
 )
 from homensai_security.actions import (
@@ -39,7 +39,6 @@ from homensai_security.actions import (
     PIN_LOCK_AFTER,
     PIN_PAUSE_MAX_SECONDS,
     PIN_PAUSE_SECONDS,
-    pin_pause_seconds,
     TTL_CHOICES,
     TTL_TITLES,
     Policy,
@@ -51,6 +50,7 @@ from homensai_security.actions import (
     lowering,
     needs_risk_ack,
     pin_failure,
+    pin_pause_seconds,
     validate_policy,
     verify_pin,
 )
@@ -91,7 +91,6 @@ __all__ = [
     "PIN_LOCK_AFTER",
     "PIN_PAUSE_MAX_SECONDS",
     "PIN_PAUSE_SECONDS",
-    "pin_pause_seconds",
     "RECOMMENDATION_CODES",
     "RECOMMENDED_LEVEL",
     "RENT_PRODUCT",
@@ -145,6 +144,7 @@ __all__ = [
     "paper_input",
     "parse_recovery_key",
     "pin_failure",
+    "pin_pause_seconds",
     "recommendation",
     "recommendation_state",
     "recovery_from_input",

@@ -26,6 +26,7 @@
 - `important.email_login_rate_item(rate, today, *, hrefs=None, lang="ru")`: строка «Важного» при исчерпании (без адресов,
   окон и кодов); `Hrefs.email_login` (по умолчанию `/security#email-login`).
 
+Сборка: ruff по `src` и mypy strict чистые (E501 разрешён для модулей таблиц текстов, `pin_pause_seconds` возвращает `int`); полный pytest модуля зелёный, `scripts/build_security_help.py --check` без расхождений.
 Ветки `secx/levels-v2` и `secx/email-rate` слиты в `secx/0.6.0` (конфликт был только в этом файле); `main` модуля не тронут, тег не создан.
 
 ## 0.5.0 — не выпущено (тег — по команде владельца)
