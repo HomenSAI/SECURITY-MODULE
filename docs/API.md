@@ -112,15 +112,15 @@ end = sec.deadline(1_000, 1800, day_end=86_400)               # 2800
 print(sec.expired(1_000, 3_000, 1800, day_end=86_400))        # True
 ```
 
-## 5. Уровни 0–5 (28.10-278)
+## 5. Уровни 0–6 (28.10-278, 373, 374)
 
 | Имя | Что |
 |---|---|
 | `LevelFacts(...)` | Факты о хозяйстве (17 полей-флагов и чисел: пароль копий, места, вне ПК, срок проверки, PIN, блокировка, целостность, цепочка, «Офис», …). Собирает продукт. |
-| `level(facts) -> int` | Наибольший уровень, у которого выполнены все меры его и нижних. |
+| `level(facts) -> int` | Цепочка 2–6 накопительная; до уровня 2 не дошли — 1 (вход по PIN и блокировка) или 0. |
 | `level_measures(facts, lang) -> list[Measure]` | Меры с отметкой `done`. |
 | `level_measures_for(target, lang)`, `missing_for(facts, target, lang)` | Список под ползунком; чего не хватает до выбранного уровня. |
-| `LEVEL_TITLES`, `RECOMMENDED_LEVEL` (=2) | Названия; уровень по умолчанию. |
+| `LEVEL_TITLES`, `RECOMMENDED_LEVEL` (=3), `MAX_LEVEL` (=6) | Названия; уровень по умолчанию. |
 
 ```python
 from homensai_security import public_api as sec
@@ -498,3 +498,15 @@ print(sec.fields.key_fingerprint(keys))  # хранить key_check_value в б�
 
 **Процедура отката (п. 5).** 1) «Проверить цепочку»; 2) `last_trusted` → номер N; 3) восстановить копию N на отдельный
 ПК или в песочницу; 4) сверить отпечатки HR1/HS1 с аварийным листом; 5) всё, что после N, — только вручную, по журналу.
+
+
+## Предложение повысить уровень (`sec.upgrade`, 28.10-375)
+
+| Имя | Что |
+|---|---|
+| `OfferState(period_days=30, anchor, answer, answered_on, declines)`, `.to_dict()`, `.from_dict(v)` | Состояние предложения (хранит продукт; испорченное — начальное) |
+| `schedule(state, today)` | Первый показ: отсчёт срока от сегодняшнего дня |
+| `due(state, level, today)` | Пора ли предлагать (на уровне 6 всегда `False`) |
+| `decline(state, today)`, `accept(state, today)` | «Не сейчас» (запоминается, срок заново) и «Повысить» |
+| `set_period(state, days, today)`, `PERIODS` | Периодичность: 14/30/60/90/180 дней; иначе `SecurityError("offer_period")` |
+| `offer(level, lang) -> Offer \| None` | Что добавится, риски остаться, риски потери ключей/паролей/PIN на новом уровне, как восстановить |

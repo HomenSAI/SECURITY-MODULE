@@ -19,11 +19,13 @@ from dataclasses import dataclass, field, replace
 from datetime import date, timedelta
 
 from homensai_security.errors import SecurityError
-from homensai_security.levels import RECOMMENDED_LEVEL
+from homensai_security.levels import MAX_LEVEL, RECOMMENDED_LEVEL
 
 DEFER_DAYS = (7, 14, 30, 90, 180)  # неделя, 2 недели, месяц, 3 месяца, полгода (277)
 CHOICES = ("chosen", "skipped", "deferred")
-RISKY_LEVELS = (0, 1)
+RISKY_LEVELS = (0, 1, 2)  # 28.10-373: ниже рекомендуемого минимума (3)
+SCALE = 7  # число делений ползунка; маркер в сохранённом состоянии (нет маркера — прежняя шкала 0–5)
+MIGRATION_DAY = date(2026, 11, 17)  # день, когда шаг pin_login появился (старые состояния получают его как «пропущен»)
 
 
 @dataclass(frozen=True)
@@ -37,17 +39,18 @@ class Step:
 STEPS: tuple[Step, ...] = (
     Step("protect_pc", None, "checklist"),
     Step("level", None, "level"),
-    Step("backup_password", 1, "setup"),
-    Step("places", 1, "setup"),
-    Step("after_events", 2, "toggle"),
-    Step("password_check", 2, "setup"),
-    Step("recovery", 2, "setup"),
-    Step("training", 2, "toggle"),
-    Step("pin_lock", 3, "setup"),
+    Step("pin_login", 1, "setup"),
+    Step("backup_password", 2, "setup"),
+    Step("places", 2, "setup"),
+    Step("after_events", 3, "toggle"),
+    Step("password_check", 3, "setup"),
+    Step("recovery", 3, "setup"),
+    Step("training", 3, "toggle"),
+    Step("pin_lock", 4, "setup"),
     Step("login", None, "setup"),
-    Step("integrity", 4, "setup"),
-    Step("chain", 4, "setup"),
-    Step("notify", 5, "setup"),
+    Step("integrity", 5, "setup"),
+    Step("chain", 5, "setup"),
+    Step("notify", 6, "setup"),
     Step("recommendations", None, "checklist"),
 )
 STEP_CODES = tuple(s.code for s in STEPS)
@@ -64,7 +67,7 @@ class Decision:
 @dataclass(frozen=True)
 class WizardState:
     required: bool = False
-    target: int | None = None  # выбранный уровень 0–5; None — ещё не выбирали (показывается рекомендуемый 2)
+    target: int | None = None  # выбранный уровень 0–6; None — ещё не выбирали (показывается рекомендуемый 3)
     steps: Mapping[str, Decision] = field(default_factory=dict)
     finished_on: date | None = None
     snoozed_until: date | None = None  # «Напомнить позже» для всего мастера
@@ -74,6 +77,7 @@ class WizardState:
     def to_dict(self) -> dict[str, object]:
         return {
             "v": 1,
+            "scale": SCALE,
             "required": self.required,
             "target": self.target,
             "steps": {code: {"choice": d.choice, "on": d.on.isoformat(), **({"until": d.until.isoformat()} if d.until else {})}
@@ -98,8 +102,17 @@ class WizardState:
                 continue
             steps[code] = Decision(str(raw["choice"]), on, until if raw.get("choice") == "deferred" else None)
         target = value.get("target")
-        if isinstance(target, bool) or not isinstance(target, int) or not 0 <= target <= 5:
+        scale = value.get("scale")
+        old_scale = scale is None
+        if scale is not None and scale != SCALE:
+            target = None  # неизвестная шкала — как испорченная
+        top = 5 if old_scale else MAX_LEVEL
+        if isinstance(target, bool) or not isinstance(target, int) or not 0 <= target <= top:
             target = None
+        elif old_scale:
+            target = max(target, 1) + 1  # 28.10-374: прежние 1–5 → 2–6, прежний 0 «Ненадёжно» → 2 «Пароль копий»
+        if old_scale and (steps or target is not None) and "pin_login" not in steps:
+            steps["pin_login"] = Decision("skipped", MIGRATION_DAY)  # новый шаг не возвращает прежнему хозяйству мастер
         state = cls(bool(value.get("required") is True), target, steps, _day(value.get("finished_on")), _day(value.get("snoozed_until")))
         if state.finished_on is not None and not finished(state):
             state = replace(state, finished_on=None)  # шаги добавились в новой версии — мастер снова не пройден
@@ -149,8 +162,8 @@ def decide(state: WizardState, code: str, choice: str, *, today: date, days: int
 
 
 def set_target(state: WizardState, level: int, *, today: date, risk_ack: bool = False) -> WizardState:
-    """Выбрать уровень 0–5 (278): уровни 0–1 — только с галочкой риска. Это и решение шага `level`."""
-    if isinstance(level, bool) or not isinstance(level, int) or not 0 <= level <= 5:
+    """Выбрать уровень 0–6 (278, 373): уровни 0–2 — только с галочкой риска. Это и решение шага `level`."""
+    if isinstance(level, bool) or not isinstance(level, int) or not 0 <= level <= MAX_LEVEL:
         raise SecurityError("wizard_level")
     if level in RISKY_LEVELS and not risk_ack:
         raise SecurityError("wizard_risk")
@@ -160,7 +173,7 @@ def set_target(state: WizardState, level: int, *, today: date, risk_ack: bool = 
 
 
 def shown_level(state: WizardState) -> int:
-    """Где стоит ползунок: выбранный уровень, иначе рекомендуемый 2."""
+    """Где стоит ползунок: выбранный уровень, иначе рекомендуемый 3."""
     return RECOMMENDED_LEVEL if state.target is None else state.target
 
 

@@ -4,7 +4,7 @@
 - «Если случилось» (`INCIDENT_IDS`) — первой страницей: 6 сценариев со ссылками на нужные места раздела;
 - страница на каждую меру (`PAGE_IDS`) по одному шаблону: что это / от чего защищает / от чего НЕ защищает / что нужно от вас /
   схема «угроза → мера → результат» / частые вопросы;
-- «Как защитить компьютер и аккаунты» (`PC_ITEMS`, 290); уровни 0–5 для интерактивного ползунка (278);
+- «Как защитить компьютер и аккаунты» (`PC_ITEMS`, 290); уровни 0–6 для интерактивного ползунка (278);
 - `BLOCK_PAGES` — какая страница открывается по «?» у блока раздела «Безопасность».
 Ссылки в данных — абстрактные цели (`section:<блок>`, `page:<страница>`, `errors`, `training:<дело>`): модуль не знает адресов
 продукта; их подставляет привязка. `problems()` сверяет оба языка: одинаковые ключи и непустые тексты."""
@@ -118,7 +118,7 @@ class LevelInfo:
 
 def level_info(value: int, lang: str = "ru") -> LevelInfo:
     """Описание уровня для ползунка в справке: что защищает и меры (накопительно)."""
-    if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 5:
+    if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= levels.MAX_LEVEL:
         raise SecurityError("wizard_level")
     titles = levels.LEVEL_TITLES["uk" if lang == "uk" else "ru"]
     return LevelInfo(value, titles[value], str(texts(lang).LEVELS[value]), tuple(levels.level_measures_for(value, lang)))
@@ -162,8 +162,8 @@ def problems() -> list[str]:
             found.append(f"{lang}: пункты «Как защитить компьютер» не совпадают с PC_ITEMS")
         if set(module.WIZARD) != set(STEP_CODES):
             found.append(f"{lang}: тексты мастера не совпадают с шагами")
-        if set(module.LEVELS) != set(range(6)):
-            found.append(f"{lang}: уровни 0–5")
+        if set(module.LEVELS) != set(range(levels.MAX_LEVEL + 1)):
+            found.append(f"{lang}: уровни 0–6")
     if len(INCIDENT_IDS) != 6:
         found.append("«Если случилось»: ровно 6 сценариев (283)")
     return found

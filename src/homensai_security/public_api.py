@@ -28,6 +28,7 @@ from homensai_security import (
     training,
     trustee,
     web,
+    upgrade,
     wizard,
 )
 from homensai_security.actions import (
@@ -60,7 +61,7 @@ from homensai_security.integrity import Problem as JournalProblem
 from homensai_security.integrity import TableDigest, audit_digest, diff_rows, root, row_hash, row_key, schema_digest, verify_chain
 from homensai_security.integrity import canonical as journal_canonical
 from homensai_security.integrity import link as journal_link
-from homensai_security.levels import LEVEL_TITLES, RECOMMENDED_LEVEL, LevelFacts, Measure, level, level_measures
+from homensai_security.levels import LEVEL_TITLES, MAX_LEVEL, RECOMMENDED_LEVEL, LevelFacts, Measure, level, level_measures
 from homensai_security.product import RENT as RENT_PRODUCT
 from homensai_security.product import Product, configure
 from homensai_security.recommendations import (
@@ -82,6 +83,7 @@ __all__ = [
     "ERRORS",
     "JOURNAL_ZERO",
     "LEVEL_TITLES",
+    "MAX_LEVEL",
     "MODES",
     "MODE_TITLES",
     "PIN_LOCK_AFTER",
@@ -277,7 +279,7 @@ def emergency_sheet_pdf(data: SheetData, lang: str = "ru", font_dir: Path | None
 
 
 # --- мастер безопасности, тренировка, помощь (28.10-277, 278, 283, 287, 289, 290) ------------------------------------
-# Правила — пространствами имён: `wizard` (шаги, решения, уровень 0–5, принудительный показ), `training` (28 дней, умные
+# Правила — пространствами имён: `wizard` (шаги, решения, уровень 0–6, принудительный показ), `training` (28 дней, умные
 # интервалы 3→7→14→30, обзор, учение, проверка кода без гашения), `help` (тексты RU/UK: «Если случилось», страницы мер,
 # уровни, «Как защитить компьютер и аккаунты»).
 
@@ -287,7 +289,7 @@ pc_remaining = recommendations.pc_remaining
 level_measures_for = levels.level_measures_for
 missing_for = levels.missing_for
 
-__all__ += ["PC_ITEMS", "help", "item_status", "level_measures_for", "missing_for", "pc_remaining", "training", "wizard"]
+__all__ += ["PC_ITEMS", "help", "item_status", "level_measures_for", "missing_for", "pc_remaining", "training", "upgrade", "wizard"]
 
 
 # --- вход и восстановление (часть C: 28.10-282, 284, 289) ----------------------------------------------------------

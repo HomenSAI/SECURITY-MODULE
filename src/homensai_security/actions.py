@@ -2,7 +2,7 @@
 """PIN для важных действий, режимы «Офис»/«Дом» и блокировка экрана (решение владельца 28.10-272; Argon2id — 28.10-279 п. 3).
 
 Чистые правила без базы и часов: время (секунды Unix) и конец дня передаёт вызывающий.
-- PIN — ровно 4 цифры ASCII, отдельный от пароля входа и PIN копий; хранится только записью Argon2id (`kdf.hash_secret`);
+- PIN — 4–6 цифр ASCII, отдельный от пароля входа и PIN копий; хранится только записью Argon2id (`kdf.hash_secret`);
 - срок действия после ввода — 5, 10, 30 минут, 1 час, 2 часа или весь день (0 — до конца местного дня); пока срок не истёк,
   PIN не спрашивается. Тот же срок — порог бездействия для блокировки экрана;
 - «Офис» — PIN и блокировка всегда включены; «Дом» — их можно выключить с галочкой «на свой страх и риск»;
@@ -17,7 +17,7 @@ import re
 from homensai_security import kdf
 from homensai_security.errors import SecurityError
 
-PIN_RE = re.compile(r"^[0-9]{4}$", re.ASCII)
+PIN_RE = re.compile(r"^[0-9]{4,6}$", re.ASCII)  # 28.10-374 п. 4: 4–6 цифр, длину выбирает владелец
 PIN_LOCK_AFTER = 5
 PIN_PAUSE_SECONDS = 600
 MODES = ("home", "office")
@@ -59,7 +59,7 @@ LOWERING = ("pin_off", "lock_off", "ttl_longer", "office_to_home", "actions_fewe
 
 
 def check_pin(pin: str) -> str:
-    """PIN из 4 цифр 0–9 (без пробелов и «широких» цифр); иначе SecurityError('pin_format')."""
+    """PIN из 4–6 цифр 0–9 (без пробелов и «широких» цифр); иначе SecurityError('pin_format')."""
     if not isinstance(pin, str) or not PIN_RE.fullmatch(pin):
         raise SecurityError("pin_format")
     return pin
@@ -89,14 +89,16 @@ class Policy:
     lock: bool = False
     ttl: int = DEFAULT_TTL
     actions: tuple[str, ...] = field(default=ACTIONS)
+    seal_manual_without_pin: bool = False  # 28.10-373: печать месяца без PIN — False: только автопечать, True: ручная с подтверждением кнопкой
 
     def normalized(self) -> Policy:
         if self.mode == "office":
-            return Policy("office", True, True, self.ttl, self.actions)
+            return Policy("office", True, True, self.ttl, self.actions, self.seal_manual_without_pin)
         return self
 
     def to_dict(self) -> dict[str, object]:
-        return {"mode": self.mode, "pin": self.pin, "lock": self.lock, "ttl": self.ttl, "actions": list(self.actions)}
+        return {"mode": self.mode, "pin": self.pin, "lock": self.lock, "ttl": self.ttl, "actions": list(self.actions),
+                "seal_manual_without_pin": self.seal_manual_without_pin}
 
     @classmethod
     def from_dict(cls, value: object) -> Policy:
@@ -110,11 +112,12 @@ class Policy:
         lock = value.get("lock", False)
         ttl = value.get("ttl", DEFAULT_TTL)
         actions = value.get("actions", list(ACTIONS))
+        seal = value.get("seal_manual_without_pin", False)
         if (mode not in MODES or not isinstance(pin, bool) or not isinstance(lock, bool) or isinstance(ttl, bool)
-                or ttl not in TTL_CHOICES or not isinstance(actions, list | tuple) or not all(a in ACTIONS for a in actions)):
+                or ttl not in TTL_CHOICES or not isinstance(actions, list | tuple) or not all(a in ACTIONS for a in actions) or not isinstance(seal, bool)):
             raise SecurityError("policy_invalid")
         ordered = tuple(a for a in ACTIONS if a in actions)
-        return cls(str(mode), pin, lock, int(ttl), ordered).normalized()
+        return cls(str(mode), pin, lock, int(ttl), ordered, seal).normalized()
 
 
 def lowering(old: Policy, new: Policy) -> tuple[str, ...]:

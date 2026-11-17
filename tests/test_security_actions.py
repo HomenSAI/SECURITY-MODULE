@@ -11,9 +11,11 @@ import pytest
 from homensai_security import public_api as security
 
 
-def test_pin_is_exactly_four_digits() -> None:
+def test_pin_is_four_to_six_digits() -> None:
     assert security.check_pin("4826") == "4826"
-    for bad in ("123", "12345", "12a4", " 482", "", "４８２６"):
+    assert security.check_pin("48261") == "48261"
+    assert security.check_pin("482617") == "482617"
+    for bad in ("123", "1234567", "12a4", " 482", "", "４８２６"):
         with pytest.raises(security.SecurityError) as err:
             security.check_pin(bad)
         assert err.value.code == "pin_format"
@@ -110,20 +112,21 @@ def _facts(**changes: object) -> security.LevelFacts:
     return security.LevelFacts(**base)  # type: ignore[arg-type]
 
 
-def test_level_is_cumulative_0_to_5() -> None:
+def test_level_is_cumulative_2_to_6_and_pin_only_below() -> None:
     assert security.level(_facts(backup_password=False, backup_pin_only=False, places=1, offsite=False)) == 0
-    assert security.level(_facts(offsite=False)) == 1
-    assert security.level(_facts()) == 2
-    assert security.level(_facts(pin=True, lock=True, ttl=1800)) == 3
-    assert security.level(_facts(pin=True, lock=True, ttl=3600)) == 2  # блокировка дольше 30 минут — ниже уровня 3
-    assert security.level(_facts(pin=True, lock=True, integrity=True)) == 4
+    assert security.level(_facts(backup_password=False, backup_pin_only=False, places=1, offsite=False, pin_login=True, lock=True)) == 1
+    assert security.level(_facts(offsite=False)) == 2
+    assert security.level(_facts()) == 3
+    assert security.level(_facts(pin=True, lock=True, ttl=1800)) == 4
+    assert security.level(_facts(pin=True, lock=True, ttl=3600)) == 3  # блокировка дольше 30 минут — ниже уровня 4
+    assert security.level(_facts(pin=True, lock=True, integrity=True)) == 5
     full = _facts(pin=True, lock=True, ttl=300, integrity=True, office=True, places_3=True, check_14=True, sheet_stored=True, notify_all=True)
-    assert security.level(full) == 5
+    assert security.level(full) == 6
     rows = security.level_measures(_facts(), "ru")
     assert [row.level for row in rows] == sorted(row.level for row in rows)
-    assert any(row.level == 3 and not row.done for row in rows)
-    assert security.LEVEL_TITLES["ru"][0] == "Ненадёжно"
-    assert security.LEVEL_TITLES["ru"][5] == "Максимальная надёжность"
+    assert any(row.level == 4 and not row.done for row in rows)
+    assert security.LEVEL_TITLES["ru"][0] == "Без защиты"
+    assert security.LEVEL_TITLES["ru"][6] == "Максимальная надёжность"
 
 
 def test_recommendations_links_and_partner_mark() -> None:

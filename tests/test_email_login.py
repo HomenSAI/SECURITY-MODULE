@@ -79,10 +79,10 @@ def test_second_factor_still_required_and_level_lowered() -> None:
     facts = levels.LevelFacts(backup_password=True, backup_pin_only=False, places=3, offsite=True, check_days=14, storage_acks=True,
                               after_events=True, pin=True, lock=True, ttl=300, integrity=True, chain=True, office=True, places_3=True,
                               check_14=True, sheet_stored=True, notify_all=True)
-    assert levels.level(facts) == 5
+    assert levels.level(facts) == 6
     weak = replace(facts, email_login_weak=True)
-    assert levels.level(weak) == 2
-    missing = [m.code for m in levels.missing_for(weak, 3)]
+    assert levels.level(weak) == 3
+    missing = [m.code for m in levels.missing_for(weak, 4)]
     assert missing == ["email_login_2fa"]
 
 

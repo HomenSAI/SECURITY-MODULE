@@ -59,7 +59,7 @@ def test_wizard_is_finished_when_every_step_is_decided_deferred_counts() -> None
     assert W.reminder_due(state, TODAY)
     for code in W.STEP_CODES:
         assert not W.finished(state)
-        state = W.set_target(state, 2, today=TODAY) if code == "level" else W.decide(state, code, "deferred", today=TODAY, days=7)
+        state = W.set_target(state, 3, today=TODAY) if code == "level" else W.decide(state, code, "deferred", today=TODAY, days=7)
     assert W.finished(state)
     assert state.finished_on == TODAY
     assert not state.required
@@ -69,22 +69,22 @@ def test_wizard_is_finished_when_every_step_is_decided_deferred_counts() -> None
     assert W.progress(state) == (len(W.STEP_CODES), len(W.STEP_CODES))
 
 
-def test_level_slider_default_two_and_risky_levels_need_ack() -> None:
+def test_level_slider_default_three_and_risky_levels_need_ack() -> None:
     state = W.WizardState()
-    assert W.shown_level(state) == 2 == security.RECOMMENDED_LEVEL
-    for level in (0, 1):
+    assert W.shown_level(state) == 3 == security.RECOMMENDED_LEVEL
+    for level in (0, 1, 2):
         with pytest.raises(security.SecurityError) as err:
             W.set_target(state, level, today=TODAY)
         assert err.value.code == "wizard_risk"
         assert W.set_target(state, level, today=TODAY, risk_ack=True).target == level
     with pytest.raises(security.SecurityError) as err:
-        W.set_target(state, 6, today=TODAY)
+        W.set_target(state, 7, today=TODAY)
     assert err.value.code == "wizard_level"
-    chosen = W.set_target(state, 4, today=TODAY)
+    chosen = W.set_target(state, 5, today=TODAY)
     assert chosen.steps["level"].choice == "chosen"
-    assert W.in_level("integrity", 4)
-    assert not W.in_level("notify", 4)
-    assert not W.in_level("login", 5)
+    assert W.in_level("integrity", 5)
+    assert not W.in_level("notify", 5)
+    assert not W.in_level("login", 6)
 
 
 def test_snooze_hides_reminder_and_forced_show_until_date() -> None:
@@ -108,12 +108,12 @@ def test_wizard_state_round_trip_and_spoiled_state_is_ignored() -> None:
 
 def test_level_measures_and_deviations() -> None:
     assert [lvl for lvl, _text in security.level_measures_for(1)] == [1, 1]
-    assert len(security.level_measures_for(5)) == len(security.level_measures_for(5, "uk"))
+    assert len(security.level_measures_for(6)) == len(security.level_measures_for(6, "uk"))
     facts = security.LevelFacts(backup_password=True, backup_pin_only=False, places=2, offsite=False, check_days=30, storage_acks=True,
                                 after_events=True, pin=False, lock=False, ttl=1800, integrity=False, chain=False, office=False,
                                 places_3=False, check_14=False, sheet_stored=False, notify_all=False)
-    assert [m.code for m in security.missing_for(facts, 2)] == ["offsite"]
-    assert [m.code for m in security.missing_for(facts, 3)] == ["offsite", "pin", "lock_30"]
+    assert [m.code for m in security.missing_for(facts, 3)] == ["offsite"]
+    assert [m.code for m in security.missing_for(facts, 4)] == ["offsite", "pin", "lock_30"]
 
 
 # --- тренировка ----------------------------------------------------------------------------------------------------
@@ -235,10 +235,10 @@ def test_protect_pc_page_items_with_minutes_and_partner_links() -> None:
 
 
 def test_level_info_for_help_slider() -> None:
-    info = security.help.level_info(2, "uk")
-    assert info.title == security.LEVEL_TITLES["uk"][2]
+    info = security.help.level_info(3, "uk")
+    assert info.title == security.LEVEL_TITLES["uk"][3]
     assert info.threats
-    assert [lvl for lvl, _t in info.measures] == [lvl for lvl, _t in security.level_measures_for(2)]
+    assert [lvl for lvl, _t in info.measures] == [lvl for lvl, _t in security.level_measures_for(3)]
     with pytest.raises(security.SecurityError):
         security.help.level_info(9)
 
