@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 import hashlib
 import secrets
@@ -171,9 +172,58 @@ def login_code_message(request_id: str, code: str) -> str:
     return f"homensai-login-code/1:{request_id}:{code}"
 
 
-def login_codes_rate_ok(sent_at: list[int] | tuple[int, ...], now: int) -> bool:
-    """Не больше 3 писем с кодом за последний час."""
-    return sum(1 for moment in sent_at if 0 <= now - moment < 3600) < LOGIN_CODES_PER_HOUR
+# Лимит писем (решение Rent 28.10-366, Н1 ревью входа по почте): страница запроса кода открыта без входа, и прежний общий
+# счётчик «3 в час на хозяйство» позволял постороннему за три запроса закрыть владельцу вход по коду на час. Теперь два
+# счётчика: «новое окно» — не больше LOGIN_CODES_PER_HOUR писем в час из одного источника (окно браузера, его определяет
+# продукт), и общий потолок хозяйства LOGIN_CODES_CEILING_HOUR, из которого последние LOGIN_CODES_OWNER_RESERVE писем —
+# запас только для доверенного источника (окно, где владелец уже входил). Исчерпание любого счётчика — строка «Важного»
+# (`important.email_login_rate_item`): пароль работает, но владелец видит, что код запрашивали.
+LOGIN_CODES_CEILING_HOUR = 10
+LOGIN_CODES_OWNER_RESERVE = 3
+LOGIN_CODES_WINDOW = 3600
+
+
+@dataclass(frozen=True)
+class LoginCodeSent:
+    """Отправленное письмо с кодом: момент (секунды Unix) и источник запроса (непрозрачная строка продукта, например
+    отпечаток окна браузера). Источник не показывается и в «Важное» не попадает."""
+
+    at: int
+    source: str | None = None
+
+
+@dataclass(frozen=True)
+class LoginRate:
+    """Решение по лимиту: ok — можно слать; reason — ok / window (источник исчерпал свои письма) / ceiling (общий потолок
+    или запас владельца); recent — писем за последний час; important — нужна строка «Важного»."""
+
+    ok: bool
+    reason: str
+    recent: int
+    important: bool
+
+
+def _recent(sent: Sequence[LoginCodeSent | int], now: int) -> list[LoginCodeSent]:
+    items = [item if isinstance(item, LoginCodeSent) else LoginCodeSent(int(item)) for item in sent]
+    return [item for item in items if 0 <= now - item.at < LOGIN_CODES_WINDOW]
+
+
+def login_codes_rate(sent: Sequence[LoginCodeSent | int], now: int, *, source: str | None, trusted: bool = False) -> LoginRate:
+    """Можно ли отправить ещё одно письмо с кодом источнику `source`. Письма без источника (прежние записи, int) считаются
+    одним общим источником None."""
+    recent = _recent(sent, now)
+    own = sum(1 for item in recent if item.source == source)
+    if own >= LOGIN_CODES_PER_HOUR:
+        return LoginRate(False, "window", len(recent), True)
+    limit = LOGIN_CODES_CEILING_HOUR if trusted else LOGIN_CODES_CEILING_HOUR - LOGIN_CODES_OWNER_RESERVE
+    if len(recent) >= limit:
+        return LoginRate(False, "ceiling", len(recent), True)
+    return LoginRate(True, "ok", len(recent), False)
+
+
+def login_codes_rate_ok(sent_at: Sequence[LoginCodeSent | int], now: int, *, source: str | None = None, trusted: bool = False) -> bool:
+    """Можно ли отправить письмо (`login_codes_rate(...).ok`). Прежний вызов без источника — один источник: 3 письма в час."""
+    return login_codes_rate(sent_at, now, source=source, trusted=trusted).ok
 
 
 def login_code_state(*, created_at: int, now: int, attempts: int, used: bool, superseded: bool) -> str:
