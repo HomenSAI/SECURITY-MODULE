@@ -79,7 +79,7 @@ class WizardState:
             "v": 1,
             "scale": SCALE,
             "required": self.required,
-            "target": self.target,
+            "target_v2": self.target,  # ключ новой шкалы 0–6; прежний «target» не пишем: 0.5.0 не примет его за свой (ревью С2)
             "steps": {code: {"choice": d.choice, "on": d.on.isoformat(), **({"until": d.until.isoformat()} if d.until else {})}
                       for code, d in self.steps.items()},
             "finished_on": self.finished_on.isoformat() if self.finished_on else None,
@@ -101,12 +101,19 @@ class WizardState:
             if on is None or (raw.get("choice") == "deferred" and until is None):
                 continue
             steps[code] = Decision(str(raw["choice"]), on, until if raw.get("choice") == "deferred" else None)
-        target = value.get("target")
         scale = value.get("scale")
-        old_scale = scale is None
-        if scale is not None and scale != SCALE:
-            target = None  # неизвестная шкала — как испорченная
-        top = 5 if old_scale else MAX_LEVEL
+        old_scale = False
+        if "target_v2" in value:
+            target = value.get("target_v2")  # уже новая шкала: сдвига нет, повторная загрузка ничего не меняет
+            if scale is not None and scale != SCALE:
+                target = None
+            top = MAX_LEVEL
+        else:
+            target = value.get("target")
+            old_scale = scale is None  # нет маркера и нет target_v2: состояние прежней шкалы 0–5 (в том числе записанное 0.5.0 после отката)
+            if scale is not None and scale != SCALE:
+                target = None  # неизвестная шкала — как испорченная
+            top = 5 if old_scale else MAX_LEVEL
         if isinstance(target, bool) or not isinstance(target, int) or not 0 <= target <= top:
             target = None
         elif old_scale:

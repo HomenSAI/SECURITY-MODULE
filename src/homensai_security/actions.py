@@ -19,7 +19,8 @@ from homensai_security.errors import SecurityError
 
 PIN_RE = re.compile(r"^[0-9]{4,6}$", re.ASCII)  # 28.10-374 п. 4: 4–6 цифр, длину выбирает владелец
 PIN_LOCK_AFTER = 5
-PIN_PAUSE_SECONDS = 600
+PIN_PAUSE_SECONDS = 600  # первая пауза; дальше удваивается за каждый новый круг из PIN_LOCK_AFTER ошибок (ревью С4)
+PIN_PAUSE_MAX_SECONDS = 86400  # потолок паузы — сутки
 MODES = ("home", "office")
 TTL_CHOICES = (300, 600, 1800, 3600, 7200, 0)  # 0 — весь день: до конца местного дня
 DEFAULT_TTL = 1800
@@ -55,7 +56,7 @@ TTL_TITLES: dict[str, dict[int, str]] = {
     "ru": {300: "5 минут", 600: "10 минут", 1800: "30 минут", 3600: "1 час", 7200: "2 часа", 0: "весь день"},
     "uk": {300: "5 хвилин", 600: "10 хвилин", 1800: "30 хвилин", 3600: "1 година", 7200: "2 години", 0: "весь день"},
 }
-LOWERING = ("pin_off", "lock_off", "ttl_longer", "office_to_home", "actions_fewer")
+LOWERING = ("pin_off", "lock_off", "ttl_longer", "office_to_home", "actions_fewer", "seal_without_pin")
 
 
 def check_pin(pin: str) -> str:
@@ -134,6 +135,8 @@ def lowering(old: Policy, new: Policy) -> tuple[str, ...]:
         found.append("office_to_home")
     if before.pin and after.pin and set(after.actions) < set(before.actions):
         found.append("actions_fewer")
+    if not before.seal_manual_without_pin and after.seal_manual_without_pin:
+        found.append("seal_without_pin")  # ревью С3: ручная печать месяца без PIN — ослабление защиты необратимого действия
     return tuple(found)
 
 
@@ -151,10 +154,20 @@ def validate_policy(policy: Policy, *, has_pin: bool) -> Policy:
     return normal
 
 
+def pin_pause_seconds(count: int) -> int:
+    """Пауза после `count`-й ошибки подряд: 0, если это не пятая; иначе 10 минут, 20, 40 … до суток (рост за каждый круг из 5 ошибок)."""
+    if count <= 0 or count % PIN_LOCK_AFTER:
+        return 0
+    cycle = count // PIN_LOCK_AFTER - 1
+    return min(PIN_PAUSE_SECONDS * (2 ** min(cycle, 20)), PIN_PAUSE_MAX_SECONDS)
+
+
 def pin_failure(failed_count: int, *, now: int) -> tuple[int, int]:
-    """Ещё одна ошибка PIN: (новый счётчик, пауза до — секунды Unix или 0). Каждая пятая ошибка подряд — пауза 10 минут."""
+    """Ещё одна ошибка PIN: (новый счётчик, пауза до — секунды Unix или 0). Каждая пятая ошибка подряд — пауза, растущая вдвое за круг (до суток).
+    Счётчик хранит и сбрасывает вызывающий (только после верного PIN); модуль сам не следит, что его не обнулили перезапуском."""
     count = failed_count + 1
-    return count, (now + PIN_PAUSE_SECONDS if count % PIN_LOCK_AFTER == 0 else 0)
+    pause = pin_pause_seconds(count)
+    return count, (now + pause if pause else 0)
 
 
 def deadline(start: int, ttl: int, *, day_end: int) -> int:

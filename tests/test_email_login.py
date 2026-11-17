@@ -76,7 +76,7 @@ def test_second_factor_still_required_and_level_lowered() -> None:
     assert reset.email_login_weakens(reset.Factors(), enabled=True)
     assert not reset.email_login_weakens(reset.Factors(totp=True), enabled=True)
     assert not reset.email_login_weakens(reset.Factors(), enabled=False)
-    facts = levels.LevelFacts(backup_password=True, backup_pin_only=False, places=3, offsite=True, check_days=14, storage_acks=True,
+    facts = levels.LevelFacts(login_protected=True, backup_password=True, backup_pin_only=False, places=3, offsite=True, check_days=14, storage_acks=True,
                               after_events=True, pin=True, lock=True, ttl=300, integrity=True, chain=True, office=True, places_3=True,
                               check_14=True, sheet_stored=True, notify_all=True)
     assert levels.level(facts) == 6

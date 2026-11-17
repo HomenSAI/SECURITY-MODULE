@@ -82,6 +82,8 @@ def due(state: OfferState, level: int, today: date) -> bool:
     """Показывать ли предложение: уровень ниже 6, срок наступил, не запланировано заново. Без отсчёта (`anchor` пуст) — нет."""
     if isinstance(level, bool) or not isinstance(level, int) or not 0 <= level < levels.MAX_LEVEL:
         return False
+    if state.anchor is not None and state.anchor > today:
+        return True  # ревью Н2: дата отсчёта в будущем (сбой часов, порча) не должна скрывать предложение
     when = next_on(state)
     return when is not None and today >= when
 

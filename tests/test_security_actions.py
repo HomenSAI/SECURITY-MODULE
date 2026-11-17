@@ -87,6 +87,16 @@ def test_five_wrong_pins_pause_for_ten_minutes() -> None:
     assert security.PIN_PAUSE_SECONDS == 600
 
 
+def test_pin_pause_grows_each_cycle_up_to_a_day() -> None:
+    """Ревью С4: пауза удваивается за каждый круг из пяти ошибок, потолок — сутки; не пятая ошибка паузы не даёт."""
+    assert [security.pin_pause_seconds(n) for n in (1, 4, 5, 6, 10, 15, 20)] == [0, 0, 600, 0, 1200, 2400, 4800]
+    assert security.pin_pause_seconds(5 * 40) == security.PIN_PAUSE_MAX_SECONDS == 86400
+    count, until = 5, 0
+    count, until = security.pin_failure(count, now=0)
+    assert (count, until) == (6, 0)
+    assert security.pin_failure(9, now=100) == (10, 100 + 1200)
+
+
 def test_deadline_uses_ttl_or_end_of_day() -> None:
     assert security.deadline(1000, 300, day_end=50_000) == 1300
     assert security.deadline(1000, 0, day_end=50_000) == 50_000
@@ -106,7 +116,7 @@ def _facts(**changes: object) -> security.LevelFacts:
     base: dict[str, object] = {
         "backup_password": True, "backup_pin_only": False, "places": 2, "offsite": True, "check_days": 30, "storage_acks": True,
         "after_events": True, "pin": False, "lock": False, "ttl": 1800, "integrity": False, "chain": True, "office": False,
-        "places_3": False, "check_14": False, "sheet_stored": False, "notify_all": False,
+        "places_3": False, "check_14": False, "sheet_stored": False, "notify_all": False, "login_protected": True,
     }
     base.update(changes)
     return security.LevelFacts(**base)  # type: ignore[arg-type]

@@ -37,8 +37,8 @@ class LevelFacts:
     check_14: bool  # проверка пароля раз в 2 недели
     sheet_stored: bool  # аварийный лист с отпечатком на бумаге, отметка «в сейфе»
     notify_all: bool  # уведомления безопасности в бот «Система»
+    login_protected: bool  # есть вход по паролю или PIN; False — вход без защиты: уровень 0, что бы ещё ни было выполнено (ревью С1: значения по умолчанию нет)
     pin_login: bool = False  # 28.10-373: вход в программу по PIN (показ; уровень 1 засчитывается и по паролю)
-    login_protected: bool = True  # есть вход по паролю или PIN; False — вход без защиты (уровень 0). По умолчанию True: в Rent вход по паролю обязателен
     email_login_weak: bool = False  # 28.10-344: вход по коду из почты включён без второго фактора — уровень 3 не засчитывается
 
 
@@ -103,17 +103,17 @@ def level_measures(facts: LevelFacts, lang: str = "ru") -> list[Measure]:
 
 
 def level(facts: LevelFacts) -> int:
-    """Достигнутый уровень. Цепочка 2–6 накопительная (прежние 1–5): наибольший уровень, все меры которого и нижних до 2 выполнены.
-    Если до уровня 2 не дошли: есть вход по паролю или PIN — уровень 1, входа нет совсем — 0 «Без защиты» (28.10-373, уточнение)."""
-    reached = 0
+    """Достигнутый уровень. Без входа по паролю или PIN — всегда 0 «Без защиты» (ревью С1: уровни 2–6 требуют меру уровня 1).
+    Иначе минимум 1, а цепочка 2–6 накопительная (прежние 1–5): наибольший уровень, все меры которого и нижних до 2 выполнены."""
+    if not facts.login_protected:
+        return 0
+    reached = 1
     for value in range(2, MAX_LEVEL + 1):
         if all(_done(code, facts) for lvl, code, _texts in _MEASURES if lvl == value):
             reached = value
         else:
             break
-    if reached:
-        return reached
-    return 1 if all(_done(code, facts) for lvl, code, _texts in _MEASURES if lvl == 1) else 0
+    return reached
 
 
 def _in_branch(measure_level: int, target: int) -> bool:

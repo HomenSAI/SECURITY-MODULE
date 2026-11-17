@@ -17,7 +17,7 @@ def facts(**kw: object) -> security.LevelFacts:
     base: dict[str, object] = dict(
         backup_password=False, backup_pin_only=False, places=1, offsite=False, check_days=0, storage_acks=False, after_events=False,
         pin=False, lock=False, ttl=1800, integrity=False, chain=False, office=False, places_3=False, check_14=False,
-        sheet_stored=False, notify_all=False)
+        sheet_stored=False, notify_all=False, login_protected=True)
     base.update(kw)
     return security.LevelFacts(**base)  # type: ignore[arg-type]
 
@@ -239,3 +239,56 @@ def test_offer_adds_are_the_measures_of_the_next_level_only() -> None:
 def test_offer_period_error_has_texts_in_both_languages() -> None:
     entry = security.ERRORS["offer_period"]
     assert entry["ru"] and entry["uk"] and entry["what_to_do_ru"] and entry["what_to_do_uk"]
+
+
+def test_no_login_means_level_zero_whatever_else_is_done() -> None:
+    """Ревью С1: все остальные меры выполнены, а входа нет — уровень 0; значения по умолчанию у login_protected нет."""
+    full = dict(backup_password=True, places=3, offsite=True, check_days=14, storage_acks=True, after_events=True, pin=True, lock=True,
+                integrity=True, chain=True, office=True, places_3=True, check_14=True, sheet_stored=True, notify_all=True)
+    assert security.level(facts(**full)) == 6
+    assert security.level(facts(login_protected=False, **full)) == 0
+    with pytest.raises(TypeError):
+        security.LevelFacts(**{k: v for k, v in dict(backup_password=False, backup_pin_only=False, places=1, offsite=False, check_days=0,
+                                                       storage_acks=False, after_events=False, pin=False, lock=False, ttl=1800,
+                                                       integrity=False, chain=False, office=False, places_3=False, check_14=False,
+                                                       sheet_stored=False, notify_all=False).items()})  # type: ignore[arg-type]
+
+
+def test_level_never_drops_when_a_measure_is_added() -> None:
+    """Монотонность: добавление выполненной меры не понижает уровень (перебор по одной мере)."""
+    import itertools
+    names = ["backup_password", "offsite", "storage_acks", "after_events", "pin", "lock", "integrity", "chain", "office", "places_3",
+             "check_14", "sheet_stored", "notify_all"]
+    for combo in itertools.chain.from_iterable(itertools.combinations(names, r) for r in range(0, 4)):
+        base = {n: True for n in combo}
+        for extra in names:
+            assert security.level(facts(**base, **{extra: True})) >= security.level(facts(**base))
+
+
+def test_target_is_stored_under_new_key_and_rollback_does_not_shift_twice() -> None:
+    """Ревью С2: 0.6.0 пишет target_v2 без прежнего target; состояние, переписанное 0.5.0 (без scale и target_v2), не сдвигается повторно."""
+    state = W.WizardState.from_dict({"v": 1, "target": 2, "steps": {}})
+    data = state.to_dict()
+    assert data["target_v2"] == 3 and "target" not in data
+    assert W.WizardState.from_dict(data).target == 3
+    # 0.5.0 читает такой файл: ключа target нет — выбор потерян, но не искажён; после сохранения 0.5.0 пишет без scale и target_v2
+    rewritten = {"v": 1, "required": True, "target": None, "steps": data["steps"]}
+    assert W.WizardState.from_dict(rewritten).target is None
+    for _ in range(3):  # откат и возврат подряд ничего не подтягивают вверх
+        assert W.WizardState.from_dict(W.WizardState.from_dict(rewritten).to_dict()).target is None
+    assert W.WizardState.from_dict({"scale": 7, "target_v2": 7}).target is None
+
+
+def test_seal_without_pin_is_a_lowering_needing_risk_ack() -> None:
+    """Ревью С3: ручная печать месяца без PIN — ослабление."""
+    safe = security.Policy(mode="home", pin=True, lock=True, ttl=300)
+    loose = security.Policy(mode="home", pin=True, lock=True, ttl=300, seal_manual_without_pin=True)
+    assert "seal_without_pin" in security.lowering(safe, loose)
+    assert security.needs_risk_ack(safe, loose)
+    assert security.lowering(loose, safe) == ()
+
+
+def test_upgrade_due_with_future_anchor() -> None:
+    """Ревью Н2: дата отсчёта в будущем не скрывает предложение."""
+    state = security.upgrade.OfferState(30, date(2099, 1, 1), None, None, 0)
+    assert security.upgrade.due(state, 2, TODAY)
