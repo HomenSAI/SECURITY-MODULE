@@ -292,3 +292,33 @@ def test_upgrade_due_with_future_anchor() -> None:
     """Ревью Н2: дата отсчёта в будущем не скрывает предложение."""
     state = security.upgrade.OfferState(30, date(2099, 1, 1), None, None, 0)
     assert security.upgrade.due(state, 2, TODAY)
+
+
+def test_migrated_risky_choice_keeps_its_risk_ack_and_does_not_ask_twice() -> None:
+    """Ревью Н4: прежний выбор 0/1 (с галочкой риска) переносится в 2; повторный выбор того же деления не просит галочку заново."""
+    for old in (0, 1):
+        state = W.WizardState.from_dict({"v": 1, "target": old, "steps": {}})
+        assert state.target == 2
+        assert state.risk_acked
+        assert W.set_target(state, 2, today=TODAY).target == 2
+        assert W.WizardState.from_dict(state.to_dict()).risk_acked
+        with pytest.raises(security.SecurityError) as err:
+            W.set_target(state, 1, today=TODAY)  # другое рискованное деление — галочка снова нужна
+        assert err.value.code == "wizard_risk"
+    fresh = W.WizardState.from_dict({"v": 1, "target": 3, "steps": {}})
+    assert not fresh.risk_acked
+    moved = W.set_target(W.set_target(fresh, 2, today=TODAY, risk_ack=True), 3, today=TODAY)
+    assert not moved.risk_acked  # ушли с рискованного деления — подтверждение сбрасывается
+    with pytest.raises(security.SecurityError):
+        W.set_target(moved, 2, today=TODAY)
+
+
+def test_pin_checks_reject_wide_digits_everywhere() -> None:
+    """Ревью Н3: «широкие» цифры не принимаются ни при установке, ни при проверке PIN (NFKC в KDF их бы совпал)."""
+    stored = security.hash_pin("1234")
+    assert security.verify_pin("1234", stored)
+    assert not security.verify_pin("１２３４", stored)
+    assert not security.verify_pin("1234 ", stored)
+    assert not security.verify_pin("1234\n", stored)
+    with pytest.raises(security.SecurityError):
+        security.check_pin("１２３４")

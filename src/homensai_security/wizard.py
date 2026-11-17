@@ -71,6 +71,7 @@ class WizardState:
     steps: Mapping[str, Decision] = field(default_factory=dict)
     finished_on: date | None = None
     snoozed_until: date | None = None  # «Напомнить позже» для всего мастера
+    risk_acked: bool = False  # выбранный рискованный уровень (0–2) уже подтверждён галочкой риска (ревью Н4: перенос не просит её второй раз)
 
     # --- хранение ------------------------------------------------------------------------------------------------
 
@@ -84,6 +85,7 @@ class WizardState:
                       for code, d in self.steps.items()},
             "finished_on": self.finished_on.isoformat() if self.finished_on else None,
             "snoozed_until": self.snoozed_until.isoformat() if self.snoozed_until else None,
+            **({"risk_acked": True} if self.risk_acked else {}),
         }
 
     @classmethod
@@ -103,6 +105,7 @@ class WizardState:
             steps[code] = Decision(str(raw["choice"]), on, until if raw.get("choice") == "deferred" else None)
         scale = value.get("scale")
         old_scale = False
+        migrated_risk = False
         if "target_v2" in value:
             target = value.get("target_v2")  # уже новая шкала: сдвига нет, повторная загрузка ничего не меняет
             if scale is not None and scale != SCALE:
@@ -117,10 +120,13 @@ class WizardState:
         if isinstance(target, bool) or not isinstance(target, int) or not 0 <= target <= top:
             target = None
         elif old_scale:
+            migrated_risk = target in (0, 1)  # прежний выбор «Ненадёжно»/«Только PIN и блокировка» делался с галочкой риска
             target = max(target, 1) + 1  # 28.10-374: прежние 1–5 → 2–6, прежний 0 «Ненадёжно» → 2 «Пароль копий»
         if old_scale and (steps or target is not None) and "pin_login" not in steps:
             steps["pin_login"] = Decision("skipped", MIGRATION_DAY)  # новый шаг не возвращает прежнему хозяйству мастер
-        state = cls(bool(value.get("required") is True), target, steps, _day(value.get("finished_on")), _day(value.get("snoozed_until")))
+        risk_acked = target is not None and target in RISKY_LEVELS and (migrated_risk or value.get("risk_acked") is True)
+        state = cls(bool(value.get("required") is True), target, steps, _day(value.get("finished_on")), _day(value.get("snoozed_until")),
+                    risk_acked)
         if state.finished_on is not None and not finished(state):
             state = replace(state, finished_on=None)  # шаги добавились в новой версии — мастер снова не пройден
         return state
@@ -172,11 +178,12 @@ def set_target(state: WizardState, level: int, *, today: date, risk_ack: bool = 
     """Выбрать уровень 0–6 (278, 373): уровни 0–2 — только с галочкой риска. Это и решение шага `level`."""
     if isinstance(level, bool) or not isinstance(level, int) or not 0 <= level <= MAX_LEVEL:
         raise SecurityError("wizard_level")
-    if level in RISKY_LEVELS and not risk_ack:
+    kept = state.risk_acked and state.target == level  # то же рискованное деление уже подтверждено (в том числе при переносе, ревью Н4)
+    if level in RISKY_LEVELS and not (risk_ack or kept):
         raise SecurityError("wizard_risk")
     steps = dict(state.steps)
     steps["level"] = Decision("chosen", today)
-    return _settle(replace(state, target=level, steps=steps), today)
+    return _settle(replace(state, target=level, steps=steps, risk_acked=level in RISKY_LEVELS), today)
 
 
 def shown_level(state: WizardState) -> int:
