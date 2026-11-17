@@ -1,6 +1,16 @@
 <!-- HomenS.AI SECURITY-MODULE · © 2026 Serhii Khomenko · https://homensai.com/ · https://github.com/HomenSAI -->
 # Изменения
 
+## 0.6.0 — не выпущено (тег — по команде владельца)
+Новая функция, обратно совместимая (минорная версия): лимит писем с кодом входа — раздельные счётчики (решение Rent
+28.10-366, Н1 ревью входа по почте: посторонний за 3 запроса закрывал владельцу вход по коду на час).
+- `reset.login_codes_rate(sent, now, *, source, trusted=False) -> LoginRate` (`ok`, `reason` window/ceiling, `recent`,
+  `important`); `reset.LoginCodeSent(at, source)`; константы `LOGIN_CODES_CEILING_HOUR` (10), `LOGIN_CODES_OWNER_RESERVE` (3).
+- `reset.login_codes_rate_ok(sent, now, *, source=None, trusted=False)`: источник запроса передаётся в проверку; прежний
+  вызов без источника — как в 0.4.0 (3 письма в час).
+- `important.email_login_rate_item(rate, today, *, hrefs=None, lang="ru")`: строка «Важного» при исчерпании (без адресов,
+  окон и кодов); `Hrefs.email_login` (по умолчанию `/security#email-login`).
+
 ## 0.5.0 — не выпущено (тег — по команде владельца)
 - 16.11.2026: ветки `secx/rent-ui-docs` (0.3.2–0.3.3) и `secx/email-login` (0.4.0–0.5.0) влиты в `main` по порядку,
   без перезаписи истории; тег не создан (по команде владельца). Колесо собирается воспроизводимо (две сборки — один SHA-256).

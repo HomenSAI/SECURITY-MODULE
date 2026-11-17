@@ -41,6 +41,7 @@ class Hrefs:
     protect_pc: str = "/help/security/protect-pc"
     level: str = "/security#level"
     journal: str = "/security#journal"
+    email_login: str = "/security#email-login"
     training: Mapping[str, str] = field(default_factory=lambda: {
         "pin": "/security/training/pin", "backup_password": "/security/training/backup", "totp": "/security/training/login",
         "hardware_key": "/security/training/login", "passkey": "/security/training/login",
@@ -113,3 +114,20 @@ def pin_paused_item(paused_until: int, now: int, today: date, *, hrefs: Hrefs | 
 def alarm_item(key: str, title: str, note: str, href: str, today: date) -> ImportantItem:
     """Настоящая тревога продукта (пароль копий 270, целостность 273, цепочка 276): красная, мигает."""
     return ImportantItem(key, title, note, href, today, alarm=True, blink=True)
+
+
+def email_login_rate_item(rate: object, today: date, *, hrefs: Hrefs | None = None, lang: str = "ru") -> ImportantItem | None:
+    """Лимит писем с кодом входа исчерпан (решение Rent 28.10-366, `reset.login_codes_rate`): серая строка, не тревога —
+    пароль работает. Только число писем за час: без адреса почты, окон браузера и кодов."""
+    if not getattr(rate, "important", False):
+        return None
+    hrefs = hrefs or Hrefs()
+    count = int(getattr(rate, "recent", 0))
+    return ImportantItem(
+        "email-login-rate",
+        _t(lang, f"Код входа по почте запрашивали часто: {count} за час", f"Код входу поштою запитували часто: {count} за годину"),
+        _t(lang, "Новые письма временно не отправляются; вход по паролю работает. Если запрашивали не вы — смените пароль почты "
+                 "и проверьте журнал безопасности",
+           "Нові листи тимчасово не надсилаються; вхід за паролем працює. Якщо запитували не ви — змініть пароль пошти "
+           "та перевірте журнал безпеки"),
+        hrefs.email_login, today)

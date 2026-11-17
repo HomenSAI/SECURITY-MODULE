@@ -316,6 +316,20 @@ verdict = reset.login_code_verdict(state=state, browser_ok=True, mac_ok=reset.ma
 reset.login_codes_rate_ok(sent_times, now); reset.email_login_weakens(reset.Factors(), enabled=True)  # True → уровень < 3
 ```
 
+### 13.2. Лимит писем с кодом: новое окно и общий потолок (решение Rent 28.10-366, версия 0.6.0)
+Страница запроса кода открыта без входа. Счётчиков два: из одного источника (окно браузера — непрозрачная строка продукта)
+не больше `LOGIN_CODES_PER_HOUR` (3) писем в час; на всё хозяйство — `LOGIN_CODES_CEILING_HOUR` (10) в час, из них
+последние `LOGIN_CODES_OWNER_RESERVE` (3) — только для доверенного источника (окно, где владелец уже входил; решает
+продукт). Исчерпание — строка «Важного» (`important.email_login_rate_item`): не тревога, только число писем за час.
+
+```python
+sent = [reset.LoginCodeSent(at, source) for at, source in rows]   # прежние int (без источника) тоже принимаются
+rate = reset.login_codes_rate(sent, now, source=window_digest, trusted=owner_window)
+if not rate.ok:                                                    # rate.reason: window | ceiling
+    item = important.email_login_rate_item(rate, today, lang="uk") # ImportantItem("email-login-rate", …) → «Важное»
+reset.login_codes_rate_ok(sent, now, source=window_digest, trusted=owner_window)  # то же, только bool
+```
+
 ## 14. Аварийный лист (28.10-279 п. 1)
 
 | Функция | Что |

@@ -66,10 +66,61 @@ def test_verdict_browser_binding_and_wrong_code() -> None:
 
 
 def test_rate_three_mails_per_hour() -> None:
+    """Прежний вызов без источника (секунды отправки): одно окно, 3 письма в час — как в 0.4.0."""
     assert reset.login_codes_rate_ok([], T0)
     assert reset.login_codes_rate_ok([T0 - 10, T0 - 20], T0)
     assert not reset.login_codes_rate_ok([T0 - 10, T0 - 20, T0 - 30], T0)
     assert reset.login_codes_rate_ok([T0 - 3600, T0 - 4000, T0 - 5000], T0)
+
+
+def test_rate_counts_new_window_and_ceiling_separately() -> None:
+    """Решение Rent 28.10-366 (Н1 ревью входа по почте): посторонний из новых окон браузера не закрывает владельцу вход.
+    Окно — свой счётчик (3 в час); общий потолок хозяйства — 10 в час, из них последние 3 — запас только для доверенного
+    источника (окно, где уже входили)."""
+    stranger = [reset.LoginCodeSent(T0 - 60 * i, f"окно-{i}") for i in range(7)]  # 7 писем из 7 разных окон за час
+    verdict = reset.login_codes_rate(stranger, T0, source="окно-новое", trusted=False)
+    assert (verdict.ok, verdict.reason, verdict.important, verdict.recent) == (False, "ceiling", True, 7)
+    owner = reset.login_codes_rate(stranger, T0, source="окно-владельца", trusted=True)
+    assert (owner.ok, owner.reason, owner.important) == (True, "ok", False)
+    assert not reset.login_codes_rate_ok(stranger, T0, source="окно-новое")
+    assert reset.login_codes_rate_ok(stranger, T0, source="окно-владельца", trusted=True)
+    full = [*stranger, *(reset.LoginCodeSent(T0 - 5, "окно-владельца") for _ in range(3))]
+    assert reset.login_codes_rate(full, T0, source="окно-владельца", trusted=True).reason == "window"
+    assert reset.login_codes_rate([*stranger, *(reset.LoginCodeSent(T0 - 5, f"x{i}") for i in range(3))], T0,
+                                  source="окно-владельца", trusted=True).reason == "ceiling"
+
+
+def test_rate_new_window_limit_and_old_letters_do_not_count() -> None:
+    same = [reset.LoginCodeSent(T0 - 10 * i, "окно-а") for i in range(3)]
+    window = reset.login_codes_rate(same, T0, source="окно-а", trusted=False)
+    assert (window.ok, window.reason, window.important) == (False, "window", True)  # исчерпание — строка в «Важное»
+    assert reset.login_codes_rate(same, T0, source="окно-б", trusted=False).ok  # другое окно — свой счётчик
+    old = [reset.LoginCodeSent(T0 - 3600 - i, "окно-а") for i in range(20)]
+    assert reset.login_codes_rate(old, T0, source="окно-а", trusted=False).ok
+    future = [reset.LoginCodeSent(T0 + 100, "окно-а")] * 5  # часы ушли назад — не в счёт
+    assert reset.login_codes_rate(future, T0, source="окно-а", trusted=False).ok
+
+
+def test_rate_important_line_has_no_addresses_or_sources() -> None:
+    """Строка «Важного» (модуль important) — только число запросов за час: без адресов, окон браузера и кодов; не тревога
+    (пароль работает), но заметна: «если запрашивали не вы — смените пароль почты»."""
+    from datetime import date
+
+    from homensai_security import important
+
+    sent = [reset.LoginCodeSent(T0 - i, "секрет-окна") for i in range(3)]
+    verdict = reset.login_codes_rate(sent, T0, source="секрет-окна", trusted=False)
+    for lang, word in (("ru", "почт"), ("uk", "пошт")):
+        item = important.email_login_rate_item(verdict, date(2027, 1, 15), lang=lang)
+        assert item is not None
+        assert item.key == "email-login-rate"
+        assert not item.alarm
+        text = item.title + " " + item.note
+        assert "3" in text
+        assert word in text.lower()
+        assert "секрет" not in text
+        assert "@" not in text
+    assert important.email_login_rate_item(reset.login_codes_rate([], T0, source="a"), date(2027, 1, 15)) is None
 
 
 def test_second_factor_still_required_and_level_lowered() -> None:
