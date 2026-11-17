@@ -37,7 +37,8 @@ class LevelFacts:
     check_14: bool  # проверка пароля раз в 2 недели
     sheet_stored: bool  # аварийный лист с отпечатком на бумаге, отметка «в сейфе»
     notify_all: bool  # уведомления безопасности в бот «Система»
-    pin_login: bool = False  # 28.10-373: вход в программу по PIN (уровень 1)
+    pin_login: bool = False  # 28.10-373: вход в программу по PIN (показ; уровень 1 засчитывается и по паролю)
+    login_protected: bool = True  # есть вход по паролю или PIN; False — вход без защиты (уровень 0). По умолчанию True: в Rent вход по паролю обязателен
     email_login_weak: bool = False  # 28.10-344: вход по коду из почты включён без второго фактора — уровень 3 не засчитывается
 
 
@@ -50,8 +51,7 @@ class Measure:
 
 
 _MEASURES: tuple[tuple[int, str, dict[str, str]], ...] = (
-    (1, "pin_login", {"ru": "Вход в программу по PIN", "uk": "Вхід у програму за PIN"}),
-    (1, "lock_any", {"ru": "Блокировка экрана включена", "uk": "Блокування екрана ввімкнено"}),
+    (1, "login_protected", {"ru": "Вход в программу по паролю или PIN", "uk": "Вхід у програму за паролем або PIN"}),
     (2, "backup_password", {"ru": "Копии с паролем или PIN (PIN — только диски ПК)", "uk": "Копії з паролем або PIN (PIN — лише диски ПК)"}),
     (2, "second_place", {"ru": "Копия на второй диск или флешку", "uk": "Копія на другий диск або флешку"}),
     (3, "real_password", {"ru": "Пароль копий, а не PIN", "uk": "Пароль копій, а не PIN"}),
@@ -83,8 +83,7 @@ def _done(code: str, f: LevelFacts) -> bool:
         "check_month": 0 < f.check_days <= 31,
         "storage_acks": f.storage_acks,
         "after_events": f.after_events,
-        "pin_login": f.pin_login,
-        "lock_any": f.lock,
+        "login_protected": f.login_protected,
         "pin": f.pin,
         "lock_30": f.lock and short,
         "email_login_2fa": not f.email_login_weak,
@@ -105,7 +104,7 @@ def level_measures(facts: LevelFacts, lang: str = "ru") -> list[Measure]:
 
 def level(facts: LevelFacts) -> int:
     """Достигнутый уровень. Цепочка 2–6 накопительная (прежние 1–5): наибольший уровень, все меры которого и нижних до 2 выполнены.
-    Если до уровня 2 не дошли, уровень 1 даёт «вход по PIN + блокировка экрана», иначе 0 «Без защиты»."""
+    Если до уровня 2 не дошли: есть вход по паролю или PIN — уровень 1, входа нет совсем — 0 «Без защиты» (28.10-373, уточнение)."""
     reached = 0
     for value in range(2, MAX_LEVEL + 1):
         if all(_done(code, facts) for lvl, code, _texts in _MEASURES if lvl == value):

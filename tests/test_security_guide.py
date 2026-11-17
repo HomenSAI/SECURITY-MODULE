@@ -107,7 +107,7 @@ def test_wizard_state_round_trip_and_spoiled_state_is_ignored() -> None:
 
 
 def test_level_measures_and_deviations() -> None:
-    assert [lvl for lvl, _text in security.level_measures_for(1)] == [1, 1]
+    assert [lvl for lvl, _text in security.level_measures_for(1)] == [1]
     assert len(security.level_measures_for(6)) == len(security.level_measures_for(6, "uk"))
     facts = security.LevelFacts(backup_password=True, backup_pin_only=False, places=2, offsite=False, check_days=30, storage_acks=True,
                                 after_events=True, pin=False, lock=False, ttl=1800, integrity=False, chain=False, office=False,

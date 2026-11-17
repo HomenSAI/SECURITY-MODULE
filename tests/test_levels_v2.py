@@ -32,10 +32,20 @@ def test_seven_titles_in_both_languages_and_recommended_three() -> None:
     assert security.RECOMMENDED_LEVEL == 3
 
 
-def test_level_one_is_pin_login_plus_lock_and_empty_facts_are_zero() -> None:
-    assert security.level(facts()) == 0
-    assert security.level(facts(pin_login=True)) == 0  # блокировки нет
-    assert security.level(facts(pin_login=True, lock=True)) == 1
+def test_level_zero_only_when_there_is_no_login_at_all() -> None:
+    assert security.level(facts(login_protected=False)) == 0
+    assert security.level(facts(login_protected=False, pin_login=True)) == 0  # pin_login — признак показа, вход считает login_protected
+    assert security.level(facts(login_protected=True)) == 1  # пароль или PIN входа — минимум уровень 1, без мер копий
+    assert security.level(facts()) == 1  # по умолчанию вход считается защищённым (в Rent пароль входа обязателен)
+    assert security.level(facts(pin_login=True, login_protected=True, lock=True)) == 1
+
+
+def test_password_login_without_backup_measures_is_not_shown_as_zero() -> None:
+    """Хозяйство со входом по паролю, но без мер копий (бывший уровень 0 «Ненадёжно»): не «Без защиты», а уровень 1."""
+    old_zero = facts(backup_password=False, backup_pin_only=False, places=1, offsite=False, login_protected=True)
+    assert security.level(old_zero) == 1
+    assert [m.code for m in security.level_measures(old_zero) if m.level == 1] == ["login_protected"]
+    assert [m.done for m in security.level_measures(old_zero) if m.level == 1] == [True]
 
 
 def test_old_chain_keeps_its_levels_shifted_by_one() -> None:
@@ -53,10 +63,10 @@ def test_old_chain_keeps_its_levels_shifted_by_one() -> None:
 
 
 def test_measures_levels_one_to_six() -> None:
-    assert [lvl for lvl, _t in security.level_measures_for(1)] == [1, 1]
+    assert [lvl for lvl, _t in security.level_measures_for(1)] == [1]
     assert max(lvl for lvl, _t in security.level_measures_for(6)) == 6
     assert len(security.level_measures_for(6)) == len(security.level_measures_for(6, "uk"))
-    assert [m.code for m in security.level_measures(facts()) if m.level == 1] == ["pin_login", "lock_any"]
+    assert [m.code for m in security.level_measures(facts()) if m.level == 1] == ["login_protected"]
 
 
 def test_risky_levels_are_zero_one_two_and_range_is_zero_to_six() -> None:

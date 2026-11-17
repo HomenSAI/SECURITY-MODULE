@@ -113,8 +113,8 @@ def _facts(**changes: object) -> security.LevelFacts:
 
 
 def test_level_is_cumulative_2_to_6_and_pin_only_below() -> None:
-    assert security.level(_facts(backup_password=False, backup_pin_only=False, places=1, offsite=False)) == 0
-    assert security.level(_facts(backup_password=False, backup_pin_only=False, places=1, offsite=False, pin_login=True, lock=True)) == 1
+    assert security.level(_facts(backup_password=False, backup_pin_only=False, places=1, offsite=False, login_protected=False)) == 0
+    assert security.level(_facts(backup_password=False, backup_pin_only=False, places=1, offsite=False)) == 1  # вход по паролю: минимум уровень 1
     assert security.level(_facts(offsite=False)) == 2
     assert security.level(_facts()) == 3
     assert security.level(_facts(pin=True, lock=True, ttl=1800)) == 4
