@@ -243,7 +243,7 @@ def test_offer_period_error_has_texts_in_both_languages() -> None:
 
 def test_no_login_means_level_zero_whatever_else_is_done() -> None:
     """Ревью С1: все остальные меры выполнены, а входа нет — уровень 0; значения по умолчанию у login_protected нет."""
-    full = dict(backup_password=True, places=3, offsite=True, check_days=14, storage_acks=True, after_events=True, pin=True, lock=True,
+    full = dict(backup_password=True, places=3, offsite=True, check_days=30, storage_acks=True, after_events=True, pin=True, lock=True, ttl=300,
                 integrity=True, chain=True, office=True, places_3=True, check_14=True, sheet_stored=True, notify_all=True)
     assert security.level(facts(**full)) == 6
     assert security.level(facts(login_protected=False, **full)) == 0
@@ -262,7 +262,7 @@ def test_level_never_drops_when_a_measure_is_added() -> None:
     for combo in itertools.chain.from_iterable(itertools.combinations(names, r) for r in range(0, 4)):
         base = {n: True for n in combo}
         for extra in names:
-            assert security.level(facts(**base, **{extra: True})) >= security.level(facts(**base))
+            assert security.level(facts(**{**base, extra: True})) >= security.level(facts(**base))
 
 
 def test_target_is_stored_under_new_key_and_rollback_does_not_shift_twice() -> None:

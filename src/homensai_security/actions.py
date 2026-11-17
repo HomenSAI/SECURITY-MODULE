@@ -141,9 +141,9 @@ def lowering(old: Policy, new: Policy) -> tuple[str, ...]:
 
 
 def needs_risk_ack(old: Policy, new: Policy) -> bool:
-    """В режиме «Дом» выключение PIN или блокировки — только с галочкой «на свой страх и риск» (как 271)."""
+    """В режиме «Дом» выключение PIN или блокировки — только с галочкой «на свой страх и риск» (как 271); так же ручная печать месяца без PIN (ревью С3)."""
     reasons = lowering(old, new)
-    return "pin_off" in reasons or "lock_off" in reasons
+    return "pin_off" in reasons or "lock_off" in reasons or "seal_without_pin" in reasons
 
 
 def validate_policy(policy: Policy, *, has_pin: bool) -> Policy:
